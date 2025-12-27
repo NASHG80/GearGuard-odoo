@@ -32,6 +32,12 @@ const EquipmentDetailPage = () => {
             <p className="text-text-secondary text-sm">Serial: {equipment.serialNumber}</p>
         </div>
         <div className="ml-auto flex gap-3">
+             <Button variant="outline" className="relative group">
+                <span className="flex flex-col items-center">
+                    <span className="text-xs font-bold text-accent-primary">2 Open</span>
+                    <span className="text-[10px] text-text-muted">Requests</span>
+                </span>
+             </Button>
              <Button variant="outline" size="sm">Edit Details</Button>
              <Button variant="danger" size="sm">Report Issue</Button>
         </div>
@@ -70,7 +76,7 @@ const EquipmentDetailPage = () => {
                 <div className="p-4 rounded-lg bg-background-secondary border border-border">
                     <p className="text-xs text-text-muted uppercase tracking-wider">Category</p>
                     <p className="font-medium text-lg flex items-center gap-2 mt-1">
-                        <Tool className="w-4 h-4 text-accent-primary" /> {equipment.category}
+                        <Wrench className="w-4 h-4 text-accent-primary" /> {equipment.category}
                     </p>
                 </div>
                 <div className="p-4 rounded-lg bg-background-secondary border border-border">
