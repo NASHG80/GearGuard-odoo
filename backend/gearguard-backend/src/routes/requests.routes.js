@@ -7,7 +7,7 @@ const {
   updateStatus,
   getRequestsByEquipment,
   getPreventiveCalendar
-} = require("../controllers/requests.controller");
+} = require("../controllers/request.controller");
 
 router.post("/", createRequest);
 router.patch("/:id/assign", assignRequest);
