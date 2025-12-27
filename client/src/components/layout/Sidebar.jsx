@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
@@ -10,8 +10,16 @@ import {
   LogOut
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../context/AuthContext';
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: Box, label: 'Equipment', path: '/dashboard/equipment' },
@@ -74,15 +82,18 @@ const Sidebar = () => {
 
       {/* User Profile */}
       <div className="p-4 border-t border-white/5 bg-black/20 backdrop-blur-md">
-        <button className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-white/5 transition-all duration-300 group border border-transparent hover:border-white/5">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-white/5 transition-all duration-300 group border border-transparent hover:border-white/5"
+        >
           <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-accent-primary to-accent-secondary p-[2px] shadow-lg shadow-accent-primary/20 group-hover:shadow-accent-primary/40 transition-shadow">
             <div className="w-full h-full rounded-full bg-background-secondary flex items-center justify-center overflow-hidden">
               <span className="font-bold text-white text-sm">JD</span>
             </div>
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <p className="text-sm font-medium text-white truncate group-hover:text-accent-primary transition-colors">John Doe</p>
-            <p className="text-xs text-text-muted truncate">Maintenance Manager</p>
+            <p className="text-sm font-medium text-white truncate group-hover:text-accent-primary transition-colors">{user?.name || 'User'}</p>
+            <p className="text-xs text-text-muted truncate">{user?.role || 'Loading...'}</p>
           </div>
           <LogOut className="w-4 h-4 text-text-muted group-hover:text-white transition-colors" />
         </button>
