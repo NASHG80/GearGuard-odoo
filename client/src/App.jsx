@@ -7,6 +7,8 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import DashboardLayout from './layouts/DashboardLayout';
 import DashboardHome from './pages/DashboardHome';
+import CreateRequestPage from './pages/CreateRequestPage';
+
 import RequestsPage from './pages/RequestsPage';
 import EquipmentPage from './pages/EquipmentPage';
 import EquipmentDetailPage from './pages/EquipmentDetailPage';
@@ -64,6 +66,7 @@ function App() {
             <Route path="equipment" element={<EquipmentPage />} />
             <Route path="equipment/:id" element={<EquipmentDetailPage />} />
             <Route path="requests" element={<RequestsPage />} />
+            <Route path="create-request" element={<CreateRequestPage />} />
             <Route path="teams" element={<MaintenanceTeamsPage />} />
             <Route path="calendar" element={<CalendarView />} />
             <Route path="reporting" element={<ReportingPage />} />

@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, Users, ClipboardList, TrendingUp, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Button from '../components/ui/Button';
-import CreateRequestModal from '../components/forms/CreateRequestModal';
 
 // Mock Data
 const mockRequests = [
@@ -13,8 +13,8 @@ const mockRequests = [
 ];
 
 const DashboardHome = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const filteredRequests = mockRequests.filter(req =>
     req.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -77,7 +77,7 @@ const DashboardHome = () => {
           variant="primary"
           size="sm"
           className="shadow-lg shadow-accent-primary/20"
-          onClick={() => setIsCreateModalOpen(true)}
+          onClick={() => navigate('/dashboard/create-request')}
         >
           + New
         </Button>
@@ -173,10 +173,7 @@ const DashboardHome = () => {
         )}
       </div>
 
-      <CreateRequestModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-      />
+
     </div>
   );
 };

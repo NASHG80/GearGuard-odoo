@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import KanbanBoard from '../components/kanban/KanbanBoard';
 import Button from '../components/ui/Button';
-import CreateRequestModal from '../components/forms/CreateRequestModal';
 
 const MOCK_REQUESTS = [
   { id: 'REQ-101', subject: 'Hydraulic Press Leak', equipmentName: 'HP-2000 Press', priority: 'HIGH', status: 'NEW', technician: null, estimatedDuration: 4, type: 'CORRECTIVE' },
@@ -14,7 +13,7 @@ const MOCK_REQUESTS = [
 ];
 
 const RequestsPage = () => {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-6">
@@ -27,7 +26,7 @@ const RequestsPage = () => {
           variant="primary"
           size="sm"
           className="shadow-lg shadow-accent-primary/20"
-          onClick={() => setIsCreateModalOpen(true)}
+          onClick={() => navigate('/dashboard/create-request')}
         >
           <Plus className="w-5 h-5 mr-2" /> New Request
         </Button>
@@ -35,10 +34,7 @@ const RequestsPage = () => {
 
       <KanbanBoard initialRequests={MOCK_REQUESTS} />
 
-      <CreateRequestModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-      />
+
     </div>
   );
 };
