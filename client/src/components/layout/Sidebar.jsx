@@ -7,7 +7,8 @@ import {
   Box,
   Calendar,
   BarChart2,
-  LogOut
+  LogOut,
+  Factory
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
@@ -27,6 +28,7 @@ const Sidebar = () => {
     { icon: Calendar, label: 'Calendar', path: '/dashboard/calendar' },
     { icon: Users, label: 'Teams', path: '/dashboard/teams' },
     { icon: BarChart2, label: 'Reporting', path: '/dashboard/reporting' },
+    { icon: Factory, label: 'Work Centers', path: '/dashboard/work-centers' },
     { icon: Settings, label: 'Settings', path: '/dashboard/settings' },
   ];
 

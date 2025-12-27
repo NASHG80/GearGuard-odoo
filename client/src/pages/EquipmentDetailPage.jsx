@@ -1,31 +1,68 @@
-import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft,
     Wrench,
     Calendar as CalIcon,
     AlertTriangle
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 import Button from '../components/ui/Button';
 import TrustScore from '../components/equipment/TrustScore';
 import DebtMeter from '../components/equipment/DebtMeter';
 
-// Mock Data Lookup
-const MOCK_EQUIPMENT = {
-    'EQ-101': { id: 'EQ-101', name: 'HP-2000 Hydraulic Press', serialNumber: 'SN-998877', category: 'Mechanical', location: 'Floor A', status: 'Active', trustScore: 85, debtLevel: 15, department: 'Production', purchaseDate: '2022-03-15', lastMaintenance: '2023-12-01', nextMaintenance: '2024-01-01' },
-    'EQ-102': { id: 'EQ-102', name: 'Server Rack Main', serialNumber: 'SN-IT-001', category: 'IT', location: 'Server Room', status: 'Active', trustScore: 98, debtLevel: 2, department: 'IT Infra', purchaseDate: '2023-01-10', lastMaintenance: '2023-12-15', nextMaintenance: '2024-06-15' },
-    'EQ-103': { id: 'EQ-103', name: 'CNC Milling M1', serialNumber: 'SN-CNC-55', category: 'Mechanical', location: 'Floor B', status: 'Warning', trustScore: 45, debtLevel: 80, department: 'Machining', purchaseDate: '2020-05-20', lastMaintenance: '2023-08-01', nextMaintenance: '2023-09-01 (Overdue)' },
-};
-
 const EquipmentDetailPage = () => {
     const { id } = useParams();
-    const equipment = MOCK_EQUIPMENT[id] || MOCK_EQUIPMENT['EQ-101']; // Fallback for demo
+    const navigate = useNavigate();
+    const [equipment, setEquipment] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchEquipmentDetails();
+    }, [id]);
+
+    const fetchEquipmentDetails = async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/equipment/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('gearguard_token')}`
+                }
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                // Transform DB fields to match UI expectations
+                const eq = data.equipment;
+                setEquipment({
+                    ...eq,
+                    serialNumber: eq.serial_number,
+                    trustScore: eq.trust_score || 100,
+                    debtLevel: eq.debt_level || 0,
+                    lastMaintenance: eq.last_maintenance ? new Date(eq.last_maintenance).toLocaleDateString() : 'Never',
+                    nextMaintenance: eq.next_maintenance ? new Date(eq.next_maintenance).toLocaleDateString() : 'Not Scheduled',
+                    purchaseDate: eq.acquisition_date ? new Date(eq.acquisition_date).toLocaleDateString() : 'Unknown'
+                });
+            } else {
+                toast.error('Failed to load equipment details');
+                navigate('/dashboard/equipment');
+            }
+        } catch (error) {
+            console.error('Fetch details error:', error);
+            toast.error('Error loading details');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const getStatusColor = (score) => {
         if (score < 50) return 'border-error/50 shadow-lg shadow-error/10';
         if (score < 80) return 'border-warning/50 shadow-lg shadow-warning/10';
         return 'border-success/50 shadow-lg shadow-success/10';
     };
+
+    if (loading) return <div className="text-center py-10 text-text-secondary">Loading details...</div>;
+    if (!equipment) return null;
 
     return (
         <div className="space-y-6">
@@ -40,7 +77,7 @@ const EquipmentDetailPage = () => {
                 <div className="ml-auto flex gap-3">
                     <Button variant="outline" className="relative group">
                         <span className="flex flex-col items-center">
-                            <span className="text-xs font-bold text-accent-primary">2 Open</span>
+                            <span className="text-xs font-bold text-accent-primary">0 Open</span>
                             <span className="text-[10px] text-text-muted">Requests</span>
                         </span>
                     </Button>
@@ -86,8 +123,8 @@ const EquipmentDetailPage = () => {
                             </p>
                         </div>
                         <div className="p-4 rounded-lg bg-background-secondary border border-border">
-                            <p className="text-xs text-text-muted uppercase tracking-wider">Department</p>
-                            <p className="font-medium text-lg mt-1">{equipment.department}</p>
+                            <p className="text-xs text-text-muted uppercase tracking-wider">Manufacturer</p>
+                            <p className="font-medium text-lg mt-1">{equipment.manufacturer || 'N/A'}</p>
                         </div>
                         <div className="p-4 rounded-lg bg-background-secondary border border-border">
                             <p className="text-xs text-text-muted uppercase tracking-wider">Location</p>
@@ -104,18 +141,9 @@ const EquipmentDetailPage = () => {
 
                     <h3 className="font-semibold text-text-primary border-b border-border pb-2 pt-4">Recent History</h3>
                     <div className="space-y-4">
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="flex items-center gap-4 p-3 hover:bg-background-secondary rounded-lg transition-colors border border-transparent hover:border-border cursor-pointer">
-                                <div className="p-2 rounded-full bg-blue-500/10 text-blue-500">
-                                    <CalIcon className="w-4 h-4" />
-                                </div>
-                                <div className="flex-1">
-                                    <p className="text-sm font-medium text-text-primary">Routine Checkup #{100 + i}</p>
-                                    <p className="text-xs text-text-muted">Completed by John Doe on Dec {20 - i}, 2023</p>
-                                </div>
-                                <span className="text-xs text-accent-success bg-accent-success/10 px-2 py-1 rounded-full">Completed</span>
-                            </div>
-                        ))}
+                        <div className="text-center text-text-muted text-sm py-4">
+                            No maintenance history available yet.
+                        </div>
                     </div>
                 </div>
             </div>

@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar, ChevronDown, MapPin, Package, FileText, ArrowLeft } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 const CreateEquipmentPage = () => {
     const navigate = useNavigate();
     const acquisitionDateRef = useRef(null);
     const warrantyExpiryRef = useRef(null);
     const [activeTab, setActiveTab] = useState('notes');
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         serialNumber: '',
@@ -23,10 +25,34 @@ const CreateEquipmentPage = () => {
         specifications: ''
     });
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Equipment form submitted:', formData);
-        navigate('/dashboard/equipment');
+        setIsSubmitting(true);
+
+        try {
+            const response = await fetch('http://localhost:5000/api/equipment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('gearguard_token')}`
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                toast.success('Equipment added successfully!');
+                navigate('/dashboard/equipment');
+            } else {
+                toast.error(data.message || 'Failed to add equipment');
+            }
+        } catch (error) {
+            console.error('Submit error:', error);
+            toast.error('Error adding equipment');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleChange = (e) => {
@@ -38,8 +64,8 @@ const CreateEquipmentPage = () => {
         <div className="max-w-5xl mx-auto py-8 px-4">
             {/* Page Header */}
             <div className="flex items-center gap-4 mb-8">
-                <button 
-                    onClick={() => navigate(-1)} 
+                <button
+                    onClick={() => navigate(-1)}
                     className="p-2 hover:bg-white/5 rounded-lg transition-colors text-text-muted hover:text-text-primary"
                 >
                     <ArrowLeft className="w-5 h-5" />
@@ -53,7 +79,7 @@ const CreateEquipmentPage = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Main Card */}
                 <div className="bg-[#161B22] border border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
-                    
+
                     {/* Header Status */}
                     <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/10">
                         <span className="px-3 py-1 rounded-full bg-accent-primary/10 text-accent-primary text-xs font-bold border border-accent-primary/20">
@@ -100,10 +126,10 @@ const CreateEquipmentPage = () => {
                                 <div>
                                     <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Category</label>
                                     <div className="relative">
-                                        <select 
-                                            name="category" 
-                                            value={formData.category} 
-                                            onChange={handleChange} 
+                                        <select
+                                            name="category"
+                                            value={formData.category}
+                                            onChange={handleChange}
                                             className="w-full bg-background-primary/30 border border-white/10 rounded-lg px-3 py-3 text-text-primary appearance-none focus:outline-none focus:border-accent-primary text-sm"
                                         >
                                             <option value="Mechanical">Mechanical</option>
@@ -119,10 +145,10 @@ const CreateEquipmentPage = () => {
                                 <div>
                                     <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Status</label>
                                     <div className="relative">
-                                        <select 
-                                            name="status" 
-                                            value={formData.status} 
-                                            onChange={handleChange} 
+                                        <select
+                                            name="status"
+                                            value={formData.status}
+                                            onChange={handleChange}
                                             className={`w-full bg-background-primary/30 border border-white/10 rounded-lg px-3 py-3 text-sm appearance-none focus:outline-none focus:border-accent-primary font-medium
                                                 ${formData.status === 'Active' ? 'text-green-400' : formData.status === 'Maintenance' ? 'text-yellow-400' : 'text-red-400'}
                                             `}
@@ -165,8 +191,8 @@ const CreateEquipmentPage = () => {
                                             className="w-full bg-background-primary/30 border border-white/10 rounded-lg px-3 py-2.5 text-text-primary text-sm focus:outline-none focus:border-accent-primary [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                                             onClick={() => acquisitionDateRef.current.showPicker()}
                                         />
-                                        <Calendar 
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none group-hover:text-accent-primary transition-colors" 
+                                        <Calendar
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none group-hover:text-accent-primary transition-colors"
                                         />
                                     </div>
                                 </div>
@@ -182,8 +208,8 @@ const CreateEquipmentPage = () => {
                                             className="w-full bg-background-primary/30 border border-white/10 rounded-lg px-3 py-2.5 text-text-primary text-sm focus:outline-none focus:border-accent-primary [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                                             onClick={() => warrantyExpiryRef.current.showPicker()}
                                         />
-                                        <Calendar 
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none group-hover:text-accent-primary transition-colors" 
+                                        <Calendar
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none group-hover:text-accent-primary transition-colors"
                                         />
                                     </div>
                                 </div>
@@ -271,8 +297,8 @@ const CreateEquipmentPage = () => {
                             <Button variant="ghost" onClick={() => navigate(-1)} type="button">
                                 Discard
                             </Button>
-                            <Button variant="primary" type="submit">
-                                Add Equipment
+                            <Button variant="primary" type="submit" disabled={isSubmitting}>
+                                {isSubmitting ? 'Adding...' : 'Add Equipment'}
                             </Button>
                         </div>
                     </div>

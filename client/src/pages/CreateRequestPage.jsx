@@ -5,6 +5,7 @@ import Button from '../components/ui/Button';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import { workCenters } from '../data/workCenters';
 
 const CreateRequestPage = () => {
     const navigate = useNavigate();
@@ -69,6 +70,20 @@ const CreateRequestPage = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+
+        if (name === 'maintenanceFor') {
+            const defaultSelection = value === 'equipment'
+                ? 'HP-2000 Hydraulic Press'
+                : (workCenters.length > 0 ? workCenters[0].name : '');
+
+            setFormData(prev => ({
+                ...prev,
+                [name]: value,
+                equipment: defaultSelection
+            }));
+            return;
+        }
+
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
@@ -148,12 +163,27 @@ const CreateRequestPage = () => {
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Equipment / Asset</label>
+                                <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">
+                                    {formData.maintenanceFor === 'equipment' ? 'Equipment / Asset' : 'Work Center'}
+                                </label>
                                 <div className="relative">
-                                    <select name="equipment" value={formData.equipment} onChange={handleChange} className="w-full bg-background-primary/30 border border-white/10 rounded-lg px-4 py-3 text-text-primary appearance-none focus:outline-none focus:border-accent-primary">
-                                        <option>HP-2000 Hydraulic Press</option>
-                                        <option>CNC Milling M1</option>
-                                        <option>Conveyor Belt System</option>
+                                    <select
+                                        name="equipment"
+                                        value={formData.equipment}
+                                        onChange={handleChange}
+                                        className="w-full bg-background-primary/30 border border-white/10 rounded-lg px-4 py-3 text-text-primary appearance-none focus:outline-none focus:border-accent-primary"
+                                    >
+                                        {formData.maintenanceFor === 'equipment' ? (
+                                            <>
+                                                <option>HP-2000 Hydraulic Press</option>
+                                                <option>CNC Milling M1</option>
+                                                <option>Conveyor Belt System</option>
+                                            </>
+                                        ) : (
+                                            workCenters.map(wc => (
+                                                <option key={wc.id} value={wc.name}>{wc.name}</option>
+                                            ))
+                                        )}
                                     </select>
                                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
                                 </div>
