@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check if user is logged in (from localStorage)
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem('gearguard_user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -25,50 +25,56 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      // TODO: Replace with actual API call
-      const response = await fetch('http://localhost:3000/api/auth/login', {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      
-      if (!response.ok) throw new Error('Login failed');
-      
+
       const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Login failed');
+      }
+
       setUser(data.user);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('gearguard_user', JSON.stringify(data.user));
+      localStorage.setItem('gearguard_token', data.token);
       return { success: true };
     } catch (error) {
+      console.error('Login error:', error);
       return { success: false, error: error.message };
     }
   };
 
   const signup = async (name, email, password, role = 'Requester') => {
     try {
-      // TODO: Replace with actual API call
-      const response = await fetch('http://localhost:3000/api/auth/signup', {
+      const response = await fetch('http://localhost:5000/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, role }),
       });
-      
-      if (!response.ok) throw new Error('Signup failed');
-      
+
       const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Signup failed');
+      }
+
       setUser(data.user);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('gearguard_user', JSON.stringify(data.user));
+      localStorage.setItem('gearguard_token', data.token);
       return { success: true };
     } catch (error) {
+      console.error('Signup error:', error);
       return { success: false, error: error.message };
     }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    localStorage.removeItem('gearguard_user');
+    localStorage.removeItem('gearguard_token');
   };
 
   return (
