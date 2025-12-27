@@ -1,46 +1,110 @@
-const pool = require("../db/db");
+const { pool } = require("../db/db");
+
+/**
+ * GET ALL MAINTENANCE REQUESTS
+ * Fetches all requests with user information
+ */
+exports.getAllRequests = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT 
+        mr.*,
+        u.name as employee_name,
+        u.email as employee_email,
+        u.role as employee_role
+      FROM maintenance_requests mr
+      LEFT JOIN users u ON mr.created_by = u.id
+      ORDER BY mr.created_at DESC`
+    );
+
+    // Add company name to each request
+    const requestsWithCompany = rows.map(request => ({
+      ...request,
+      company: 'GearGuard Industries'
+    }));
+
+    res.json({
+      success: true,
+      requests: requestsWithCompany
+    });
+  } catch (err) {
+    console.error('Get requests error:', err);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching maintenance requests",
+      error: err.message
+    });
+  }
+};
 
 /**
  * CREATE MAINTENANCE REQUEST
- * Auto-fills maintenance team from equipment
+ * Stores all form data from CreateRequestPage
  */
 exports.createRequest = async (req, res) => {
   try {
-    const { subject, type, equipment_id, scheduled_date, created_by } = req.body;
+    const {
+      subject,
+      maintenanceFor,
+      equipment,
+      category,
+      requestDate,
+      maintenanceType,
+      team,
+      technician,
+      scheduledDate,
+      duration,
+      priority,
+      description,
+      instructions,
+      createdBy
+    } = req.body;
 
-    const [[equipment]] = await pool.query(
-      "SELECT maintenance_team_id, is_scrapped FROM equipment WHERE id = ?",
-      [equipment_id]
-    );
-
-    if (!equipment) {
-      return res.status(404).json({ message: "Equipment not found" });
+    // Validation
+    if (!subject || !requestDate || !createdBy) {
+      return res.status(400).json({
+        success: false,
+        message: "Subject, request date, and user ID are required"
+      });
     }
 
-    if (equipment.is_scrapped) {
-      return res.status(400).json({ message: "Equipment is scrapped" });
-    }
-
+    // Insert into database
     const [result] = await pool.query(
       `INSERT INTO maintenance_requests
-       (subject, type, equipment_id, maintenance_team_id, scheduled_date, status, created_by)
-       VALUES (?, ?, ?, ?, ?, 'NEW', ?)`,
+       (subject, maintenance_for, equipment, category, request_date, 
+        maintenance_type, team, technician, scheduled_date, duration, 
+        priority, description, instructions, created_by, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'NEW')`,
       [
         subject,
-        type,
-        equipment_id,
-        equipment.maintenance_team_id,
-        scheduled_date,
-        created_by
+        maintenanceFor || 'equipment',
+        equipment,
+        category,
+        requestDate,
+        maintenanceType,
+        team,
+        technician,
+        scheduledDate || null,
+        duration,
+        priority,
+        description,
+        instructions,
+        createdBy
       ]
     );
 
     res.status(201).json({
-      message: "Request created",
-      request_id: result.insertId
+      success: true,
+      message: "Maintenance request created successfully",
+      requestId: result.insertId
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Create request error:', err);
+    res.status(500).json({
+      success: false,
+      message: "Error creating maintenance request",
+      error: err.message
+    });
   }
 };
 

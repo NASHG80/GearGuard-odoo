@@ -1,6 +1,6 @@
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { Clock, AlertTriangle, PenTool, User } from 'lucide-react';
+import { Clock, AlertTriangle, User, Briefcase, Building2 } from 'lucide-react';
 
 const priorityColors = {
   LOW: 'border-l-4 border-l-blue-500',
@@ -36,17 +36,38 @@ const RequestCard = ({ request }) => {
         )}
       </div>
 
-      <h4 className="font-medium text-text-primary mb-1 line-clamp-2">{request.subject}</h4>
-      <p className="text-sm text-text-secondary mb-3">{request.equipmentName}</p>
+      <h4 className="font-medium text-text-primary mb-3 line-clamp-2">{request.subject}</h4>
 
-      <div className="flex items-center justify-between text-xs text-text-muted mt-auto">
-        <div className="flex items-center gap-1">
-            <User className="w-3 h-3" />
-            <span>{request.technician || 'Unassigned'}</span>
+      <div className="space-y-2">
+        {/* Employee */}
+        <div className="flex items-center gap-2 text-xs">
+          <User className="w-3.5 h-3.5 text-text-muted flex-shrink-0" />
+          <span className="text-text-secondary">
+            <span className="text-text-muted">Employee:</span> {request.employee || 'N/A'}
+          </span>
         </div>
-        <div className="flex items-center gap-1">
-            <Clock className="w-3 h-3" />
-            <span>{request.estimatedDuration}h</span>
+
+        {/* Technician */}
+        <div className="flex items-center gap-2 text-xs">
+          <Briefcase className="w-3.5 h-3.5 text-text-muted flex-shrink-0" />
+          <span className="text-text-secondary">
+            <span className="text-text-muted">Technician:</span> {request.technician || 'Unassigned'}
+          </span>
+        </div>
+
+        {/* Category */}
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-text-secondary">
+            <span className="text-text-muted">Category:</span> {request.category || 'N/A'}
+          </span>
+        </div>
+
+        {/* Company */}
+        <div className="flex items-center gap-2 text-xs">
+          <Building2 className="w-3.5 h-3.5 text-text-muted flex-shrink-0" />
+          <span className="text-text-secondary">
+            {request.company || 'GearGuard Industries'}
+          </span>
         </div>
       </div>
     </div>

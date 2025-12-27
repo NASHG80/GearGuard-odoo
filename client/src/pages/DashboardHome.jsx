@@ -1,25 +1,60 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, Users, ClipboardList, TrendingUp, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Button from '../components/ui/Button';
-
-// Mock Data
-const mockRequests = [
-  { id: 1, subject: 'Hydraulic Press Oil Leak', employee: 'Mitchell Admin', technician: 'Ann Foster', category: 'Hydraulic', stage: 'New Request', company: 'GearGuard Industries' },
-  { id: 2, subject: 'CNC Calibration Required', employee: 'Sarah Chen', technician: 'Mike Wilson', category: 'CNC Machine', stage: 'In Progress', company: 'GearGuard Industries' },
-  { id: 3, subject: 'Conveyor Belt Replacement', employee: 'John Smith', technician: 'Ann Foster', category: 'Conveyor', stage: 'New Request', company: 'GearGuard Industries' },
-  { id: 4, subject: 'Compressor Noise Issue', employee: 'David Park', technician: 'Tom Harris', category: 'Compressor', stage: 'Overdue', company: 'GearGuard Industries' },
-];
+import toast from 'react-hot-toast';
 
 const DashboardHome = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredRequests = mockRequests.filter(req =>
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  const fetchRequests = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/requests', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('gearguard_token')}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Transform data to match Dashboard format
+        const transformedRequests = data.requests.map(req => ({
+          id: req.id,
+          subject: req.subject,
+          employee: req.employee_name,
+          technician: req.technician || 'Unassigned',
+          category: req.category,
+          stage: req.status === 'NEW' ? 'New Request' :
+            req.status === 'IN_PROGRESS' ? 'In Progress' :
+              req.status === 'REPAIRED' ? 'Repaired' :
+                req.status === 'SCRAP' ? 'Scrap' : req.status,
+          company: req.company || 'GearGuard Industries'
+        }));
+        setRequests(transformedRequests);
+      } else {
+        toast.error('Failed to load requests');
+      }
+    } catch (error) {
+      console.error('Fetch requests error:', error);
+      toast.error('Error loading requests');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredRequests = requests.filter(req =>
     req.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    req.employee.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    req.technician.toLowerCase().includes(searchQuery.toLowerCase())
+    (req.employee && req.employee.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (req.technician && req.technician.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const stats = [
@@ -45,7 +80,7 @@ const DashboardHome = () => {
     },
     {
       title: 'Open Requests',
-      value: '12 Pending',
+      value: `${requests.filter(r => r.stage !== 'Repaired' && r.stage !== 'Scrap').length} Pending`,
       subtitle: '3 Overdue',
       color: 'green',
       icon: ClipboardList,

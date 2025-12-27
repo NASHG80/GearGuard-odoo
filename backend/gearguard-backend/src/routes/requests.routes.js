@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const {
+  getAllRequests,
   createRequest,
   assignRequest,
   updateStatus,
@@ -9,6 +10,10 @@ const {
   getPreventiveCalendar
 } = require("../controllers/request.controller");
 
+// Get all requests
+router.get("/", getAllRequests);
+
+// Create new request
 router.post("/", createRequest);
 router.patch("/:id/assign", assignRequest);
 router.patch("/:id/status", updateStatus);
