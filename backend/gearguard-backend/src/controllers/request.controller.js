@@ -1,5 +1,6 @@
 const { pool } = require("../db/db");
 
+
 /**
  * GET ALL MAINTENANCE REQUESTS
  * Fetches all requests with user information
