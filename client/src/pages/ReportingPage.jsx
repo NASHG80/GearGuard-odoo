@@ -29,14 +29,6 @@ ChartJS.register(
   Filler
 );
 
-// --- KPI Data ---
-const KPIS = [
-    { label: 'Total Requests', value: '1,248', change: '+12%', icon: Activity, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-    { label: 'Completion Rate', value: '94.2%', change: '+2.4%', icon: CheckCircle, color: 'text-green-400', bg: 'bg-green-500/10' },
-    { label: 'Avg. Resolution', value: '4.2h', change: '-18%', icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
-    { label: 'Critical Issues', value: '5', change: '-2', icon: AlertTriangle, color: 'text-red-400', bg: 'bg-red-500/10' },
-];
-
 // --- Chart Options ---
 const commonOptions = {
     responsive: true,
@@ -102,25 +94,54 @@ const ReportingPage = () => {
             total: [12, 19, 15, 25, 22, 30, 45],
             completed: [10, 15, 12, 20, 18, 25, 40],
             status: [45, 12, 8, 3], // Completed, In Progress, Pending, Critical
-            team: [20, 28, 15, 18]
+            team: [20, 28, 15, 18],
+            // KPI Data for Week
+            kpis: {
+                totalRequests: { value: '168', change: '+8%' },
+                completionRate: { value: '83.3%', change: '+1.2%' },
+                avgResolution: { value: '3.5h', change: '-12%' },
+                criticalIssues: { value: '3', change: '-1' }
+            }
         },
         Month: {
             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             total: [65, 59, 80, 81, 56, 55, 40, 60, 70, 80, 90, 100],
             completed: [50, 45, 70, 75, 40, 45, 30, 50, 60, 70, 80, 90],
-            status: [300, 50, 100, 45],
-            team: [120, 150, 90, 110]
+            status: [100, 50, 100, 45],
+            team: [120, 150, 90, 110],
+            // KPI Data for Month
+            kpis: {
+                totalRequests: { value: '836', change: '+12%' },
+                completionRate: { value: '94.2%', change: '+2.4%' },
+                avgResolution: { value: '4.2h', change: '-18%' },
+                criticalIssues: { value: '5', change: '-2' }
+            }
         },
         Year: {
             labels: ['2021', '2022', '2023', '2024', '2025'],
             total: [500, 750, 900, 1100, 1248],
             completed: [450, 700, 850, 1050, 1180],
-            status: [2500, 400, 300, 150],
-            team: [800, 950, 700, 850]
+            status: [2000, 400, 300, 150],
+            team: [800, 950, 700, 850],
+            // KPI Data for Year
+            kpis: {
+                totalRequests: { value: '4,498', change: '+24%' },
+                completionRate: { value: '91.8%', change: '+5.6%' },
+                avgResolution: { value: '5.1h', change: '-22%' },
+                criticalIssues: { value: '18', change: '-8' }
+            }
         }
     };
 
     const currentData = chartData[selectedPeriod];
+
+    // Dynamic KPIs based on selected period
+    const KPIS = [
+        { label: 'Total Requests', value: currentData.kpis.totalRequests.value, change: currentData.kpis.totalRequests.change, icon: Activity, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+        { label: 'Completion Rate', value: currentData.kpis.completionRate.value, change: currentData.kpis.completionRate.change, icon: CheckCircle, color: 'text-green-400', bg: 'bg-green-500/10' },
+        { label: 'Avg. Resolution', value: currentData.kpis.avgResolution.value, change: currentData.kpis.avgResolution.change, icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
+        { label: 'Critical Issues', value: currentData.kpis.criticalIssues.value, change: currentData.kpis.criticalIssues.change, icon: AlertTriangle, color: 'text-red-400', bg: 'bg-red-500/10' },
+    ];
 
     const monthlyData = {
         labels: currentData.labels,

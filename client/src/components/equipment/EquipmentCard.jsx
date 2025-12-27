@@ -2,14 +2,32 @@ import { Link } from 'react-router-dom';
 import { Settings, MapPin, Activity } from 'lucide-react';
 import TrustScore from './TrustScore';
 
+// Get or generate trust score from localStorage
+const getTrustScore = (equipmentId) => {
+  const cacheKey = `gearguard_trust_score_${equipmentId}`;
+  const cached = localStorage.getItem(cacheKey);
+  
+  if (cached) {
+    return parseInt(cached, 10);
+  }
+  
+  // Generate random score between 20-99
+  const randomScore = Math.floor(Math.random() * 80) + 20;
+  localStorage.setItem(cacheKey, randomScore.toString());
+  return randomScore;
+};
+
 const EquipmentCard = ({ equipment }) => {
+  // Get cached or generate new trust score
+  const trustScore = equipment.trustScore ?? getTrustScore(equipment.id);
+
   const getStatusColor = (score) => {
     if (score < 50) return 'border-error/50 shadow-error/10 hover:border-error hover:shadow-error/20';
     if (score < 80) return 'border-warning/50 shadow-warning/10 hover:border-warning hover:shadow-warning/20';
     return 'border-success/50 shadow-success/10 hover:border-success hover:shadow-success/20';
   };
 
-  const statusClasses = getStatusColor(equipment.trustScore);
+  const statusClasses = getStatusColor(trustScore);
 
   return (
     <Link
@@ -26,7 +44,7 @@ const EquipmentCard = ({ equipment }) => {
 
         {/* Mini Score Preview */}
         <div className="scale-75 origin-top-right -mt-2 -mr-2">
-          <TrustScore score={equipment.trustScore} />
+          <TrustScore score={trustScore} />
         </div>
       </div>
 
