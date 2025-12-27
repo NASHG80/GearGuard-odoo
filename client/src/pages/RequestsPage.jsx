@@ -1,19 +1,64 @@
 import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import KanbanBoard from '../components/kanban/KanbanBoard';
 import Button from '../components/ui/Button';
 
-const MOCK_REQUESTS = [
-  { id: 'REQ-101', subject: 'Hydraulic Press Leak', equipmentName: 'HP-2000 Press', priority: 'HIGH', status: 'NEW', technician: null, estimatedDuration: 4, type: 'CORRECTIVE' },
-  { id: 'REQ-102', subject: 'Conveyor Belt Misalignment', equipmentName: 'Line A Conveyor', priority: 'MEDIUM', status: 'IN_PROGRESS', technician: 'Jane Doe', estimatedDuration: 2, type: 'CORRECTIVE' },
-  { id: 'REQ-103', subject: 'Monthly AC Service', equipmentName: 'Server Room AC', priority: 'LOW', status: 'NEW', technician: null, estimatedDuration: 1, type: 'PREVENTIVE' },
-  { id: 'REQ-104', subject: 'Control Panel Short Circuit', equipmentName: 'CNC Milling M1', priority: 'CRITICAL', status: 'IN_PROGRESS', technician: 'Mike Smith', estimatedDuration: 8, type: 'CORRECTIVE' },
-  { id: 'REQ-105', subject: 'Oil Change', equipmentName: 'Forklift F-04', priority: 'MEDIUM', status: 'REPAIRED', technician: 'John Doe', estimatedDuration: 1.5, type: 'PREVENTIVE' },
-  { id: 'REQ-106', subject: 'Sensor Calibration', equipmentName: 'Robotic Arm R-02', priority: 'HIGH', status: 'SCRAP', technician: 'Tech Lead', estimatedDuration: 3, type: 'CORRECTIVE' },
-];
-
 const RequestsPage = () => {
   const navigate = useNavigate();
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  const fetchRequests = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/requests', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('gearguard_token')}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Transform data to match KanbanBoard format
+        const transformedRequests = data.requests.map(req => ({
+          id: `REQ-${req.id}`,
+          subject: req.subject,
+          equipmentName: req.equipment || 'N/A',
+          employee: req.employee_name,
+          technician: req.technician || 'Unassigned',
+          category: req.category,
+          priority: req.priority.toUpperCase(),
+          status: req.status,
+          estimatedDuration: parseFloat(req.duration) || 0,
+          type: req.maintenance_type.toUpperCase(),
+          company: req.company || 'GearGuard Industries'
+        }));
+
+        setRequests(transformedRequests);
+      } else {
+        toast.error('Failed to load requests');
+      }
+    } catch (error) {
+      console.error('Fetch requests error:', error);
+      toast.error('Error loading requests');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-text-secondary">Loading requests...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -32,9 +77,7 @@ const RequestsPage = () => {
         </Button>
       </div>
 
-      <KanbanBoard initialRequests={MOCK_REQUESTS} />
-
-
+      <KanbanBoard initialRequests={requests} />
     </div>
   );
 };

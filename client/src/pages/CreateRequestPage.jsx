@@ -3,11 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar, ChevronDown, Clock, User, FileText, Info, ArrowLeft } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const CreateRequestPage = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const dateInputRef = useRef(null);
     const [activeTab, setActiveTab] = useState('notes');
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         subject: '',
         maintenanceFor: 'equipment',
@@ -24,10 +28,43 @@ const CreateRequestPage = () => {
         instructions: ''
     });
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Form submitted:', formData);
-        navigate('/dashboard/requests');
+
+        if (!user) {
+            toast.error('You must be logged in to create a request');
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            const response = await fetch('http://localhost:5000/api/requests', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('gearguard_token')}`
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    createdBy: user.id
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                toast.success('Maintenance request created successfully!');
+                navigate('/dashboard/requests');
+            } else {
+                toast.error(data.message || 'Failed to create request');
+            }
+        } catch (error) {
+            console.error('Submit error:', error);
+            toast.error('Error creating request. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleChange = (e) => {
@@ -39,8 +76,8 @@ const CreateRequestPage = () => {
         <div className="max-w-5xl mx-auto py-8 px-4">
             {/* Page Header */}
             <div className="flex items-center gap-4 mb-8">
-                <button 
-                    onClick={() => navigate(-1)} 
+                <button
+                    onClick={() => navigate(-1)}
                     className="p-2 hover:bg-white/5 rounded-lg transition-colors text-text-muted hover:text-text-primary"
                 >
                     <ArrowLeft className="w-5 h-5" />
@@ -54,7 +91,7 @@ const CreateRequestPage = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Main Card */}
                 <div className="bg-[#161B22] border border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
-                    
+
                     {/* Header Status */}
                     <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/10">
                         <span className="px-3 py-1 rounded-full bg-accent-primary/10 text-accent-primary text-xs font-bold border border-accent-primary/20">
@@ -126,10 +163,10 @@ const CreateRequestPage = () => {
                                 <div>
                                     <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Category</label>
                                     <div className="relative">
-                                        <select 
-                                            name="category" 
-                                            value={formData.category} 
-                                            onChange={handleChange} 
+                                        <select
+                                            name="category"
+                                            value={formData.category}
+                                            onChange={handleChange}
                                             className="w-full bg-background-primary/30 border border-white/10 rounded-lg px-3 py-3 text-text-primary appearance-none focus:outline-none focus:border-accent-primary text-sm"
                                         >
                                             <option value="Mechanical">Mechanical</option>
@@ -152,8 +189,8 @@ const CreateRequestPage = () => {
                                             className="w-full bg-background-primary/30 border border-white/10 rounded-lg px-3 py-2.5 text-text-primary text-sm focus:outline-none focus:border-accent-primary [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                                             onClick={() => dateInputRef.current.showPicker()}
                                         />
-                                        <Calendar 
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none group-hover:text-accent-primary transition-colors" 
+                                        <Calendar
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none group-hover:text-accent-primary transition-colors"
                                         />
                                     </div>
                                 </div>
@@ -166,10 +203,10 @@ const CreateRequestPage = () => {
                                 <div>
                                     <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Priority</label>
                                     <div className="relative">
-                                        <select 
-                                            name="priority" 
-                                            value={formData.priority} 
-                                            onChange={handleChange} 
+                                        <select
+                                            name="priority"
+                                            value={formData.priority}
+                                            onChange={handleChange}
                                             className={`w-full bg-background-primary/30 border border-white/10 rounded-lg px-3 py-2.5 text-sm appearance-none focus:outline-none focus:border-accent-primary font-medium
                                                 ${formData.priority === 'high' ? 'text-red-400' : formData.priority === 'medium' ? 'text-yellow-400' : 'text-blue-400'}
                                             `}
@@ -184,12 +221,11 @@ const CreateRequestPage = () => {
                                 <div>
                                     <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Duration (Hrs)</label>
                                     <div className="relative">
-                                        <input 
-                                            type="text" 
-                                            name="duration" 
-                                            value={formData.duration} 
-                                            onChange={handleChange} 
-                                            className="w-full bg-background-primary/30 border border-white/10 rounded-lg px-3 py-2.5 text-text-primary text-sm focus:outline-none focus:border-accent-primary" 
+                                        <input
+                                            type="text"
+                                            name="duration" value={formData.duration}
+                                            onChange={handleChange}
+                                            className="w-full bg-background-primary/30 border border-white/10 rounded-lg px-3 py-2.5 text-text-primary text-sm focus:outline-none focus:border-accent-primary"
                                         />
                                         <Clock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
                                     </div>
@@ -267,7 +303,7 @@ const CreateRequestPage = () => {
                         </div>
                     </div>
 
-                    {/* Footer - Moved outside/below or inside? Let's keep it inside for card feel */}
+                    {/* Footer */}
                     <div className="flex justify-between items-center pt-8 mt-4 border-t border-white/10">
                         <div className="text-xs text-text-muted">
                             <span className="text-accent-primary">*</span> Required fields
@@ -276,8 +312,8 @@ const CreateRequestPage = () => {
                             <Button variant="ghost" onClick={() => navigate(-1)} type="button">
                                 Discard
                             </Button>
-                            <Button variant="primary" type="submit">
-                                Save Request
+                            <Button variant="primary" type="submit" disabled={isSubmitting}>
+                                {isSubmitting ? 'Saving...' : 'Save Request'}
                             </Button>
                         </div>
                     </div>
