@@ -9,6 +9,8 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/requests", require("./routes/requests.routes"));
+app.use("/api/calendar", require("./routes/calendar.routes"));
+
 
 app.get("/", (req, res) => {
   res.json({ message: "GearGuard Backend Running" });

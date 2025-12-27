@@ -1,4 +1,5 @@
-const { pool } = require("../db/db");
+const pool = require("../db/db");
+
 
 /**
  * GET ALL MAINTENANCE REQUESTS

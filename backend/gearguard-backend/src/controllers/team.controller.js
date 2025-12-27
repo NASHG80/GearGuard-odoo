@@ -1,5 +1,6 @@
 const pool = require("../db/db");
 
+
 exports.getTeams = async (req, res) => {
   try {
     const [teams] = await pool.query(

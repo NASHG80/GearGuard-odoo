@@ -16,37 +16,39 @@ const RequestsPage = () => {
 
   const fetchRequests = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/requests', {
+      const response = await fetch('/api/requests', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('gearguard_token')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem('gearguard_token') || ''}`,
+        },
       });
 
       const data = await response.json();
 
-      if (data.success) {
-        // Transform data to match KanbanBoard format
-        const transformedRequests = data.requests.map(req => ({
-          id: `REQ-${req.id}`,
-          subject: req.subject,
-          equipmentName: req.equipment || 'N/A',
-          employee: req.employee_name,
-          technician: req.technician || 'Unassigned',
-          category: req.category,
-          priority: req.priority.toUpperCase(),
-          status: req.status,
-          estimatedDuration: parseFloat(req.duration) || 0,
-          type: req.maintenance_type.toUpperCase(),
-          company: req.company || 'GearGuard Industries'
-        }));
-
-        setRequests(transformedRequests);
-      } else {
-        toast.error('Failed to load requests');
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to load requests');
       }
+
+      // Transform backend data → KanbanBoard format
+      const transformedRequests = data.requests.map(req => ({
+        id: `REQ-${req.id}`,
+        subject: req.subject,
+        equipmentName: req.equipment || 'N/A',
+        technician: req.technician || 'Unassigned',
+        category: req.category,
+        priority: req.priority.toUpperCase(),
+        status: req.status, // NEW / IN_PROGRESS / COMPLETED
+        estimatedDuration: parseFloat(req.duration) || 0,
+        type: req.maintenance_type.toUpperCase(), // CORRECTIVE / PREVENTIVE
+        company: 'GearGuard Industries',
+
+        // calendar-related (optional, safe)
+        scheduledDate: req.scheduled_date || null,
+      }));
+
+      setRequests(transformedRequests);
     } catch (error) {
       console.error('Fetch requests error:', error);
-      toast.error('Error loading requests');
+      toast.error('Error loading maintenance requests');
     } finally {
       setLoading(false);
     }
@@ -64,16 +66,22 @@ const RequestsPage = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-text-primary">Maintenance Requests</h2>
-          <p className="text-text-secondary">Drag and drop cards to update status</p>
+          <h2 className="text-2xl font-bold text-text-primary">
+            Maintenance Requests
+          </h2>
+          <p className="text-text-secondary">
+            Drag and drop cards to update status
+          </p>
         </div>
+
         <Button
           variant="primary"
           size="sm"
           className="shadow-lg shadow-accent-primary/20"
           onClick={() => navigate('/dashboard/create-request')}
         >
-          <Plus className="w-5 h-5 mr-2" /> New Request
+          <Plus className="w-5 h-5 mr-2" />
+          New Request
         </Button>
       </div>
 
