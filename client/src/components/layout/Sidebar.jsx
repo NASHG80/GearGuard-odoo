@@ -29,9 +29,7 @@ const Sidebar = () => {
         <div className="w-8 h-8 bg-accent-primary rounded-lg flex items-center justify-center">
           <span className="font-bold text-white">G</span>
         </div>
-        <span className="text-xl font-bold bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent">
-          GearGuard
-        </span>
+        <span className="text-xl font-bold text-white tracking-tight relative z-10">GearGuard</span>
       </div>
 
       {/* Navigation */}
