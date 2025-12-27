@@ -1,0 +1,47 @@
+/* Dark Theme Overrides for React Big Calendar */
+.rbc-calendar {
+    color: var(--color-text-primary);
+}
+
+.rbc-off-range-bg {
+    background: var(--color-background-primary);
+}
+
+.rbc-header {
+    border-bottom: 1px solid var(--color-border);
+    padding: 10px;
+}
+
+.rbc-day-bg + .rbc-day-bg {
+    border-left: 1px solid var(--color-border);
+}
+
+.rbc-month-view, .rbc-time-view, .rbc-agenda-view {
+    border: 1px solid var(--color-border);
+}
+
+.rbc-month-row + .rbc-month-row {
+    border-top: 1px solid var(--color-border);
+}
+
+.rbc-day-bg {
+    background-color: var(--color-background-card);
+}
+
+.rbc-today {
+    background-color: rgba(59, 130, 246, 0.1); /* accent-primary with low opacity */
+}
+
+.rbc-toolbar button {
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+}
+
+.rbc-toolbar button:active, .rbc-toolbar button.rbc-active {
+    background-color: var(--color-accent-primary);
+    color: white;
+}
+
+.rbc-toolbar button:hover {
+    background-color: var(--color-background-secondary);
+}
