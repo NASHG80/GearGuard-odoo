@@ -1,9 +1,34 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  body {
-    @apply bg-background-primary text-text-primary antialiased;
+@theme {
+  --color-background-primary: #0B0F14;
+  --color-background-secondary: #121826;
+  --color-background-card: #161B22;
+
+  --color-text-primary: #E6EDF3;
+  --color-text-secondary: #9BA3AF;
+  --color-text-muted: #6B7280;
+
+  --color-border: #1F2937;
+
+  --color-accent-primary: #3B82F6;
+  --color-accent-success: #22C55E;
+  --color-accent-warning: #F59E0B;
+  --color-accent-danger: #EF4444;
+
+  --animate-fade-in: fadeIn 0.5s ease-out;
+  --animate-slide-up: slideUp 0.5s ease-out;
+
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
   }
+  @keyframes slideUp {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+}
+
+body {
+  @apply bg-background-primary text-text-primary antialiased;
 }
