@@ -35,9 +35,9 @@ const Header = ({ title = "Dashboard" }) => {
 
             <div className="h-8 w-[1px] bg-white/10 mx-1"></div>
 
-            <Button size="sm" variant="primary" onClick={() => setIsRequestModalOpen(true)} className="shadow-lg shadow-accent-primary/20 hover:shadow-accent-primary/40 transition-shadow">
+            {/* <Button size="sm" variant="primary" onClick={() => setIsRequestModalOpen(true)} className="shadow-lg shadow-accent-primary/20 hover:shadow-accent-primary/40 transition-shadow">
               + New Request
-            </Button>
+            </Button> */}
           </div>
         </div>
       </header>
