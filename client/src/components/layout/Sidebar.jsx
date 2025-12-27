@@ -7,7 +7,7 @@ import {
   Box,
   Calendar,
   BarChart2,
-  LogOut
+  LogOut,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -24,6 +24,7 @@ const Sidebar = () => {
 
   return (
     <aside className="w-64 bg-background-card border-r border-border min-h-screen flex flex-col fixed left-0 top-0">
+      {/* Logo */}
       <div className="p-6 flex items-center gap-3">
         <div className="w-8 h-8 bg-accent-primary rounded-lg flex items-center justify-center">
           <span className="font-bold text-white">G</span>
@@ -33,16 +34,18 @@ const Sidebar = () => {
         </span>
       </div>
 
+      {/* Navigation */}
       <nav className="flex-1 px-4 space-y-2 mt-4">
-        {links.map((link) => (
+        {navItems.map((item) => (
           <NavLink
-            key={link.path}
-            to={link.path}
-            end={link.path === '/dashboard'}
+            key={item.path}
+            to={item.path}
+            end={item.path === '/dashboard'}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${isActive
-                ? 'text-accent-primary bg-accent-primary/10'
-                : 'text-text-secondary hover:bg-background-secondary hover:text-text-primary'
+              `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${
+                isActive
+                  ? 'text-accent-primary bg-accent-primary/10'
+                  : 'text-text-secondary hover:bg-background-secondary hover:text-text-primary'
               }`
             }
           >
@@ -52,13 +55,10 @@ const Sidebar = () => {
                   <motion.div
                     layoutId="activeTab"
                     className="absolute left-0 w-1 h-8 bg-accent-primary rounded-r-full"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
                   />
                 )}
-                <link.icon className={`w-5 h-5 ${isActive ? 'text-accent-primary' : 'group-hover:text-text-primary'}`} />
-                <span className="font-medium">{link.label}</span>
+                <item.icon className="w-5 h-5" />
+                <span className="font-medium">{item.label}</span>
               </>
             )}
           </NavLink>
@@ -69,13 +69,17 @@ const Sidebar = () => {
       <div className="p-4 border-t border-white/5 bg-black/20">
         <button className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-white/5 transition-colors group">
           <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-accent-primary to-accent-secondary p-[2px]">
-            <div className="w-full h-full rounded-full bg-background-secondary flex items-center justify-center overflow-hidden">
+            <div className="w-full h-full rounded-full bg-background-secondary flex items-center justify-center">
               <span className="font-bold text-white text-sm">JD</span>
             </div>
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <p className="text-sm font-medium text-white truncate group-hover:text-accent-primary transition-colors">John Doe</p>
-            <p className="text-xs text-text-muted truncate">Maintenance Manager</p>
+            <p className="text-sm font-medium text-white truncate group-hover:text-accent-primary transition-colors">
+              John Doe
+            </p>
+            <p className="text-xs text-text-muted truncate">
+              Maintenance Manager
+            </p>
           </div>
           <LogOut className="w-4 h-4 text-text-muted group-hover:text-white transition-colors" />
         </button>
