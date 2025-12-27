@@ -1,4 +1,4 @@
-const pool = require("../db/db");
+const { pool } = require("../db/db");
 
 /**
  * MONTH VIEW
@@ -22,14 +22,14 @@ const getCalendarData = async (req, res) => {
 
     const result = {};
 
-   rows.forEach(row => {
-  const dateKey = row.request_date.toLocaleDateString('en-CA');
-  if (!result[dateKey]) result[dateKey] = [];
-  result[dateKey].push({
-    id: row.id,
-    priority: row.priority
-  });
-});
+    rows.forEach(row => {
+      const dateKey = row.request_date.toLocaleDateString('en-CA');
+      if (!result[dateKey]) result[dateKey] = [];
+      result[dateKey].push({
+        id: row.id,
+        priority: row.priority
+      });
+    });
 
 
     res.json(result);
