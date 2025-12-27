@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -85,74 +86,103 @@ const doughnutOptions = {
     scales: { x: { display: false }, y: { display: false } },
     plugins: {
         ...commonOptions.plugins,
-        legend: { position: 'right', labels: { color: '#9BA3AF', boxWidth: 12 } } // Legend on right for doughnut
+        legend: { display: false } // Disable generic legend to use custom one for layout control
     }
 };
 
-// --- Chart Data ---
-
-const monthlyData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-        {
-            label: 'Incoming Requests',
-            data: [65, 59, 80, 81, 56, 95],
-            borderColor: '#3B82F6',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            fill: true,
-            pointBackgroundColor: '#3B82F6',
-            pointBorderColor: '#1F2937',
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: '#3B82F6',
-        },
-        {
-            label: 'Resolved',
-            data: [60, 55, 75, 78, 54, 90],
-            borderColor: '#10B981',
-            backgroundColor: 'rgba(16, 185, 129, 0.0)', // No fill for second line
-            borderDash: [5, 5],
-            pointBackgroundColor: '#10B981',
-            pointBorderColor: '#1F2937',
-        }
-    ]
-};
-
-const teamPerformanceData = {
-    labels: ['Alpha Squad', 'Beta Techs', 'Gamma Crew', 'Delta Team'],
-    datasets: [
-        {
-            label: 'On-Time',
-            data: [45, 38, 50, 25],
-            backgroundColor: '#3B82F6',
-            borderRadius: 4,
-        },
-        {
-            label: 'Overdue',
-            data: [5, 12, 3, 2],
-            backgroundColor: '#EF4444',
-            borderRadius: 4,
-        },
-    ]
-};
-
-const statusDistributionData = {
-    labels: ['Completed', 'In Progress', 'Pending Review', 'Scrap'],
-    datasets: [
-        {
-            data: [350, 120, 80, 45],
-            backgroundColor: [
-                '#10B981', // Green
-                '#3B82F6', // Blue
-                '#F59E0B', // Yellow
-                '#EF4444', // Red
-            ],
-            borderWidth: 0,
-            hoverOffset: 4
-        }
-    ]
-};
+// ... (keep existing code)
 
 const ReportingPage = () => {
+    const [selectedPeriod, setSelectedPeriod] = useState('Month');
+
+    // Dynamic Data Map
+    const chartData = {
+        Week: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            total: [12, 19, 15, 25, 22, 30, 45],
+            completed: [10, 15, 12, 20, 18, 25, 40],
+            status: [45, 12, 8, 3], // Completed, In Progress, Pending, Critical
+            team: [20, 28, 15, 18]
+        },
+        Month: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            total: [65, 59, 80, 81, 56, 55, 40, 60, 70, 80, 90, 100],
+            completed: [50, 45, 70, 75, 40, 45, 30, 50, 60, 70, 80, 90],
+            status: [300, 50, 100, 45],
+            team: [120, 150, 90, 110]
+        },
+        Year: {
+            labels: ['2021', '2022', '2023', '2024', '2025'],
+            total: [500, 750, 900, 1100, 1248],
+            completed: [450, 700, 850, 1050, 1180],
+            status: [2500, 400, 300, 150],
+            team: [800, 950, 700, 850]
+        }
+    };
+
+    const currentData = chartData[selectedPeriod];
+
+    const monthlyData = {
+        labels: currentData.labels,
+        datasets: [
+            {
+                label: 'Total Requests',
+                data: currentData.total,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                tension: 0.4,
+            },
+            {
+                label: 'Completed Requests',
+                data: currentData.completed,
+                borderColor: 'rgb(153, 102, 255)',
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                fill: true,
+                tension: 0.4,
+            },
+        ],
+    };
+
+    const statusDistributionData = {
+        labels: ['Completed', 'In Progress', 'Pending', 'Critical'],
+        datasets: [
+            {
+                data: currentData.status,
+                backgroundColor: ['#4CAF50', '#2196F3', '#FFC107', '#F44336'],
+                borderColor: '#1F2937',
+                borderWidth: 2,
+            },
+        ],
+    };
+
+    const teamPerformanceData = {
+        labels: ['Team A', 'Team B', 'Team C', 'Team D'],
+        datasets: [
+            {
+                label: 'Requests Handled',
+                data: currentData.team,
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)',
+                    'rgba(255, 99, 132, 0.6)',
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                ],
+                borderWidth: 1,
+                barThickness: 50,
+                maxBarThickness: 50,
+            },
+        ],
+    };
+
+    const totalRequests = currentData.status.reduce((a, b) => a + b, 0);
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -162,7 +192,15 @@ const ReportingPage = () => {
                 </div>
                 <div className="flex bg-background-card p-1 rounded-lg border border-border">
                     {['Week', 'Month', 'Year'].map((period) => (
-                        <button key={period} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${period === 'Month' ? 'bg-accent-primary text-white shadow-sm' : 'text-text-muted hover:text-text-primary'}`}>
+                        <button 
+                            key={period} 
+                            onClick={() => setSelectedPeriod(period)}
+                            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                                selectedPeriod === period 
+                                ? 'bg-accent-primary text-white shadow-sm' 
+                                : 'text-text-muted hover:text-text-primary'
+                            }`}
+                        >
                             {period}
                         </button>
                     ))}
@@ -222,11 +260,27 @@ const ReportingPage = () => {
                     className="lg:col-span-1 bg-background-card border border-border rounded-xl p-6"
                 >
                     <h3 className="text-lg font-bold text-text-primary mb-6">Request Distribution</h3>
-                    <div className="h-[300px] flex items-center justify-center relative">
-                        <Doughnut options={doughnutOptions} data={statusDistributionData} />
-                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <span className="text-2xl font-bold text-text-primary">595</span>
-                            <span className="text-xs text-text-muted">Total</span>
+                    <div className="h-[300px] flex items-center justify-center gap-8">
+                        {/* Chart Container */}
+                        <div className="relative w-48 h-48">
+                            <Doughnut options={doughnutOptions} data={statusDistributionData} />
+                            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                <span className="text-2xl font-bold text-text-primary">{totalRequests}</span>
+                                <span className="text-xs text-text-muted">Total</span>
+                            </div>
+                        </div>
+
+                        {/* Custom Legend */}
+                        <div className="space-y-3">
+                            {statusDistributionData.labels.map((label, index) => (
+                                <div key={label} className="flex items-center gap-3">
+                                    <div 
+                                        className="w-3 h-3 rounded-full" 
+                                        style={{ backgroundColor: statusDistributionData.datasets[0].backgroundColor[index] }}
+                                    ></div>
+                                    <span className="text-sm text-text-secondary">{label}</span>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </motion.div>
