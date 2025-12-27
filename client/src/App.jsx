@@ -56,9 +56,9 @@ function App() {
           
           {/* Protected Dashboard Routes with Layout */}
           <Route path="/dashboard" element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <DashboardLayout />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           }>
             <Route index element={<DashboardHome />} />
             <Route path="equipment" element={<EquipmentPage />} />

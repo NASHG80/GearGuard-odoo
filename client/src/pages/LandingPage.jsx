@@ -1,78 +1,15 @@
-<<<<<<< HEAD
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import Button from '../components/ui/Button';
-import LoginModal from '../components/auth/LoginModal';
-import { getCurrentUser } from '../services/authService';
-
-const LandingPage = () => {
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [user, setUser] = useState(getCurrentUser());
-  const navigate = useNavigate();
-
-  const handleLoginSuccess = (userData) => {
-    setUser(userData);
-    // Redirect to dashboard after successful login
-    setTimeout(() => {
-      navigate('/dashboard');
-    }, 500);
-  };
-
-  return (
-    <div className="min-h-screen bg-background-primary flex flex-col relative overflow-hidden">
-      {/* Background Grid Effect */}
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none"
-        style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #3B82F6 1px, transparent 0)', backgroundSize: '40px 40px' }}>
-      </div>
-
-      {/* Header */}
-      <header className="relative z-10 w-full max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="flex items-center gap-2"
-        >
-          <div className="w-8 h-8 bg-accent-primary rounded-lg shadow-[0_0_15px_#3B82F6] flex items-center justify-center">
-            <span className="font-bold text-white">G</span>
-          </div>
-          <span className="text-xl font-bold tracking-tight text-white">GearGuard</span>
-        </motion.div>
-
-        <div className="flex gap-4">
-          {user ? (
-            <div className="flex items-center gap-3">
-              <span className="text-text-secondary text-sm">
-                Welcome, <span className="text-accent-primary font-medium">{user.name}</span>
-              </span>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => navigate('/dashboard')}
-              >
-                Go to Dashboard
-              </Button>
-            </div>
-          ) : (
-            <>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setIsLoginModalOpen(true)}
-              >
-                Log In
-              </Button>
-              <Button variant="primary" size="sm">Book Demo</Button>
-            </>
-          )}
-=======
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import { ArrowRight, Shield, Zap, BarChart3, Globe, Lock } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const LandingPage = () => {
   const targetRef = useRef(null);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
   const { scrollYProgress } = useScroll({
     target: targetRef,
     offset: ["start start", "end start"]
@@ -110,25 +47,43 @@ const LandingPage = () => {
           <div className="flex gap-4">
             <Button variant="ghost" size="sm" className="hidden md:flex text-text-secondary hover:text-white">Features</Button>
             <Button variant="ghost" size="sm" className="hidden md:flex text-text-secondary hover:text-white">Pricing</Button>
-            <Button variant="secondary" size="sm" className="glass-button">Log In</Button>
-            <Button variant="primary" size="sm" className="shadow-lg shadow-accent-primary/25">Book Demo</Button>
+            {user ? (
+              <Button
+                variant="primary"
+                size="sm"
+                className="shadow-lg shadow-accent-primary/25"
+                onClick={() => navigate('/dashboard')}
+              >
+                Go to Dashboard
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="glass-button"
+                  onClick={() => navigate('/login')}
+                >
+                  Log In
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="shadow-lg shadow-accent-primary/25"
+                  onClick={() => navigate('/signup')}
+                >
+                  Get Started
+                </Button>
+              </>
+            )}
           </div>
->>>>>>> 34d515df813af2266609a3f880e891f382556d95
         </div>
       </header>
 
-      {/* Hero Section */}
       <main ref={targetRef} className="relative z-10 pt-32 pb-20 px-6">
         <motion.div
-<<<<<<< HEAD
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="max-w-4xl mx-auto space-y-6"
-=======
           style={{ opacity, scale }}
           className="max-w-5xl mx-auto text-center space-y-8"
->>>>>>> 34d515df813af2266609a3f880e891f382556d95
         >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -143,12 +98,6 @@ const LandingPage = () => {
             The Future of Industrial Maintenance
           </motion.div>
 
-<<<<<<< HEAD
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight text-white mb-6">
-            Stop managing breakdowns. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-primary to-blue-400">
-              Start predicting them.
-=======
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -158,23 +107,9 @@ const LandingPage = () => {
             Predict Failures. <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-primary via-blue-400 to-accent-secondary animate-gradient-x">
               Maximize Uptime.
->>>>>>> 34d515df813af2266609a3f880e891f382556d95
             </span>
           </motion.h1>
 
-<<<<<<< HEAD
-          <p className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-10">
-            GearGuard isn't just a maintenance log. It's an intelligent platform that tells you
-            which machines are silently becoming expensive mistakes.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button
-              size="lg"
-              className="w-full sm:w-auto min-w-[200px]"
-              onClick={() => setIsLoginModalOpen(true)}
-            >
-=======
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -191,34 +126,24 @@ const LandingPage = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8"
           >
-            <Button size="lg" className="w-full sm:w-auto min-w-[200px] h-14 text-lg shadow-xl shadow-accent-primary/20 group">
->>>>>>> 34d515df813af2266609a3f880e891f382556d95
-              Get Started Now
+            <Button
+              size="lg"
+              className="w-full sm:w-auto min-w-[200px] h-14 text-lg shadow-xl shadow-accent-primary/20 group"
+              onClick={() => navigate(user ? '/dashboard' : '/signup')}
+            >
+              {user ? 'Go to Dashboard' : 'Get Started Now'}
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button variant="outline" size="lg" className="w-full sm:w-auto min-w-[200px] h-14 text-lg glass-button hover:bg-white/5">
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto min-w-[200px] h-14 text-lg glass-button hover:bg-white/5"
+            >
               View Live Demo
             </Button>
           </motion.div>
         </motion.div>
 
-<<<<<<< HEAD
-        {/* Floating UI Elements Mockup */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-          className="mt-20 w-full max-w-5xl relative"
-        >
-          <div className="rounded-xl border border-border bg-background-secondary/50 backdrop-blur-sm p-2 shadow-2xl">
-            <div className="rounded-lg bg-background-primary overflow-hidden border border-border/50 aspect-video relative flex items-center justify-center text-text-muted">
-              {/* Placeholder for Dashboard Image/Component */}
-              <div className="text-center space-y-2">
-                <div className="text-4xl">📊</div>
-                <p>Interactive Dashboard Preview</p>
-                <p className="text-sm">(Will be replaced with live components)</p>
-              </div>
-=======
         {/* Dashboard Preview */}
         <motion.div
           initial={{ opacity: 0, y: 100, rotateX: 20 }}
@@ -241,48 +166,38 @@ const LandingPage = () => {
 
               {/* Hover Glow Effect */}
               <div className="absolute inset-0 bg-gradient-to-t from-background-primary via-transparent to-transparent opacity-60"></div>
->>>>>>> 34d515df813af2266609a3f880e891f382556d95
             </div>
           </div>
         </motion.div>
+
+        {/* Features Grid */}
+        <section className="relative z-10 py-32 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-20">
+              <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Built for Modern Industry</h2>
+              <p className="text-text-secondary max-w-2xl mx-auto text-lg">Everything you need to maintain your fleet, all in one beautiful interface.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <FeatureCard
+                icon={<Zap className="w-8 h-8 text-accent-warning" />}
+                title="Real-time Monitoring"
+                description="Track every metric instantly with sub-second latency updates."
+              />
+              <FeatureCard
+                icon={<Lock className="w-8 h-8 text-accent-success" />}
+                title="Enterprise Security"
+                description="Bank-grade encryption and role-based access control built-in."
+              />
+              <FeatureCard
+                icon={<Globe className="w-8 h-8 text-accent-primary" />}
+                title="Global Connectivity"
+                description="Manage assets across multiple facilities from a single dashboard."
+              />
+            </div>
+          </div>
+        </section>
       </main>
-
-<<<<<<< HEAD
-      {/* Login Modal */}
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        onLoginSuccess={handleLoginSuccess}
-      />
-=======
-      {/* Features Grid */}
-      <section className="relative z-10 py-32 px-6 bg-background-secondary/50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Built for Modern Industry</h2>
-            <p className="text-text-secondary max-w-2xl mx-auto text-lg">Everything you need to maintain your fleet, all in one beautiful interface.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <FeatureCard
-              icon={<Zap className="w-8 h-8 text-accent-warning" />}
-              title="Real-time Monitoring"
-              description="Track every metric instantly with sub-second latency updates."
-            />
-            <FeatureCard
-              icon={<Lock className="w-8 h-8 text-accent-success" />}
-              title="Enterprise Security"
-              description="Bank-grade encryption and role-based access control built-in."
-            />
-            <FeatureCard
-              icon={<Globe className="w-8 h-8 text-accent-primary" />}
-              title="Global Connectivity"
-              description="Manage assets across multiple facilities from a single dashboard."
-            />
-          </div>
-        </div>
-      </section>
->>>>>>> 34d515df813af2266609a3f880e891f382556d95
     </div>
   );
 };
