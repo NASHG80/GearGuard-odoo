@@ -2,15 +2,15 @@ import { motion } from 'framer-motion';
 
 const TrustScore = ({ score }) => {
   // Determine color based on score
-  let color = 'text-accent-success';
-  let ringColor = 'stroke-accent-success';
-  
+  let color = 'text-success';
+  let ringColor = 'stroke-success';
+
   if (score < 50) {
-    color = 'text-accent-danger';
-    ringColor = 'stroke-accent-danger';
+    color = 'text-error';
+    ringColor = 'stroke-error';
   } else if (score < 80) {
-    color = 'text-accent-warning';
-    ringColor = 'stroke-accent-warning';
+    color = 'text-warning';
+    ringColor = 'stroke-warning';
   }
 
   const radius = 30;

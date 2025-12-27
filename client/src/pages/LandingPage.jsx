@@ -134,7 +134,7 @@ const LandingPage = () => {
                   variant="secondary"
                   size="sm"
                   className="glass-button"
-                  onClick={() => setIsLoginModalOpen(true)}
+                  onClick={() => navigate('/login')}
                 >
                   Log In
                 </Button>
