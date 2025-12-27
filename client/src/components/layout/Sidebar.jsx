@@ -70,11 +70,11 @@ const Sidebar = () => {
                 )}
                 <item.icon className={`w-5 h-5 relative z-10 transition-colors ${isActive ? 'text-accent-primary' : 'group-hover:text-white'}`} />
                 <span className="font-medium relative z-10">{item.label}</span>
-                {item.path === '/dashboard/requests' && (
+                {/* {item.path === '/dashboard/requests' && (
                   <span className="ml-auto relative z-10 bg-accent-danger/20 border border-accent-danger/20 text-accent-danger text-xs font-bold px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.2)]">
                     3
                   </span>
-                )}
+                )} */}
               </>
             )}
           </NavLink>
