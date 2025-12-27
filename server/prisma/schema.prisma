@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  TECHNICIAN
+}
+
+enum TeamType {
+  MECHANICAL
+  ELECTRICAL
+  IT
+  GENERAL
+}
+
+enum AssetCategory {
+  MECHANICAL
+  ELECTRICAL
+  IT
+  VEHICLE
+  OTHER
+}
+
+enum RequestType {
+  CORRECTIVE
+  PREVENTIVE
+}
+
+enum RequestStatus {
+  NEW
+  IN_PROGRESS
+  REPAIRED
+  SCRAP
+}
+
+enum RequestPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model MaintenanceTeam {
+  id        String   @id @default(uuid())
+  name      String
+  type      TeamType @default(GENERAL)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  technicians User[]
+  equipments  Equipment[]
+  requests    MaintenanceRequest[]
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  role      UserRole @default(TECHNICIAN)
+  teamId    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  team             MaintenanceTeam?     @relation(fields: [teamId], references: [id])
+  assignedRequests MaintenanceRequest[]
+  assignedEquipment Equipment[]
+}
+
+model Equipment {
+  id            String        @id @default(uuid())
+  name          String
+  serialNumber  String        @unique
+  category      AssetCategory
+  department    String
+  location      String
+  purchaseDate  DateTime?
+  warrantyStart DateTime?
+  warrantyEnd   DateTime?
+  isScrap       Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  assignedEmployeeId String?
+  assignedTeamId     String?
+
+  assignedEmployee User?            @relation(fields: [assignedEmployeeId], references: [id])
+  assignedTeam     MaintenanceTeam? @relation(fields: [assignedTeamId], references: [id])
+  requests         MaintenanceRequest[]
+}
+
+model MaintenanceRequest {
+  id                String          @id @default(uuid())
+  subject           String
+  description       String?         @db.Text
+  type              RequestType
+  priority          RequestPriority @default(MEDIUM)
+  status            RequestStatus   @default(NEW)
+  scheduledDate     DateTime?
+  estimatedDuration Int? // in minutes
+  actualDuration    Int? // in minutes
+  completedAt       DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  equipmentId    String
+  assignedTechId String?
+  teamId         String?
+
+  equipment    Equipment        @relation(fields: [equipmentId], references: [id])
+  assignedTech User?            @relation(fields: [assignedTechId], references: [id])
+  team         MaintenanceTeam? @relation(fields: [teamId], references: [id])
+}
