@@ -1,7 +1,6 @@
-import { useState, useRef, useLayoutEffect } from 'react';
+import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, User, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { gsap } from 'gsap';
 
 // Mock data for maintenance tasks
 const mockTasks = [
@@ -19,19 +18,26 @@ const CalendarView = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTasks, setSelectedTasks] = useState([]);
-  const calendarRef = useRef(null);
 
-  useLayoutEffect(() => {
-    if (calendarRef.current) {
-      gsap.from('.calendar-day', {
-        scale: 0,
-        opacity: 0,
-        stagger: 0.02,
-        duration: 0.4,
-        ease: 'back.out(1.2)'
-      });
+  // Variants for animation
+  const containerVariants = {
+    hidden: { opacity: 1 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.02
+      }
     }
-  }, [currentDate]);
+  };
+
+  const dayVariants = {
+    hidden: { scale: 0, opacity: 0 },
+    visible: {
+      scale: 1,
+      opacity: 1,
+      transition: { duration: 0.4, ease: "backOut" }
+    }
+  };
 
   const daysInMonth = (date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -101,7 +107,13 @@ const CalendarView = () => {
 
     // Empty cells for days before the first day of the month
     for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="calendar-day"></div>);
+      days.push(
+        <motion.div 
+          key={`empty-${i}`} 
+          variants={dayVariants}
+          className="calendar-day"
+        ></motion.div>
+      );
     }
 
     // Days of the month
@@ -115,6 +127,7 @@ const CalendarView = () => {
       days.push(
         <motion.div
           key={day}
+          variants={dayVariants}
           whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => handleDateClick(day)}
@@ -197,9 +210,15 @@ const CalendarView = () => {
               ))}
             </div>
             {/* Calendar Days */}
-            <div ref={calendarRef} className="grid grid-cols-7 gap-3">
+            <motion.div 
+              key={currentDate.toISOString()}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-7 gap-3"
+            >
               {renderCalendarDays()}
-            </div>
+            </motion.div>
           </div>
         </div>
 
