@@ -23,8 +23,12 @@ const LandingPage = () => {
         </motion.div>
         
         <div className="flex gap-4">
-          <Button variant="secondary" size="sm">Log In</Button>
-          <Button variant="primary" size="sm">Book Demo</Button>
+          <Button variant="primary" size="lg" onClick={() => window.location.href = '/login'}>
+            Get Started
+          </Button>
+          <Button variant="outline" size="lg" onClick={() => window.location.href = '/signup'}>
+            Sign Up Free
+          </Button>
         </div>
       </header>
 
