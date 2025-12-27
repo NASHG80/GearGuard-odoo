@@ -1,6 +1,10 @@
-import React, { useRef, useLayoutEffect } from 'react';
-import { Link } from 'react-router-dom';
+
+import React, { useState, useRef, useLayoutEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import Button from '../components/ui/Button';
+import LoginModal from '../components/auth/LoginModal';
+import { getCurrentUser } from '../services/authService';
 import { ArrowRight, Shield, Zap, BarChart3, Globe, Lock, Cpu } from 'lucide-react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -8,9 +12,21 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const LandingPage = () => {
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [user, setUser] = useState(getCurrentUser());
+  const navigate = useNavigate();
+
   const mainRef = useRef(null);
   const heroRef = useRef(null);
   const featuresRef = useRef(null);
+
+  const handleLoginSuccess = (userData) => {
+    setUser(userData);
+    // Redirect to dashboard after successful login
+    setTimeout(() => {
+      navigate('/dashboard');
+    }, 500);
+  };
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -83,23 +99,50 @@ const LandingPage = () => {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-background-primary/70 backdrop-blur-xl transition-all duration-300">
         <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-          <div className="flex items-center gap-3 group cursor-pointer">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3 group cursor-pointer"
+          >
             <div className="w-10 h-10 bg-gradient-to-br from-accent-primary to-accent-secondary rounded-xl shadow-lg shadow-accent-primary/20 flex items-center justify-center relative overflow-hidden transition-transform duration-300 group-hover:scale-105">
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
               <Shield className="w-6 h-6 text-white relative z-10" />
             </div>
             <span className="text-xl font-bold tracking-tight text-white group-hover:text-accent-primary transition-colors">GearGuard</span>
-          </div>
+          </motion.div>
 
-          <div className="flex gap-4">
-            <Button variant="ghost" size="sm" className="hidden md:flex text-text-secondary hover:text-white transition-colors">Features</Button>
-            <Button variant="ghost" size="sm" className="hidden md:flex text-text-secondary hover:text-white transition-colors">Pricing</Button>
-            <Link to="/login">
-              <Button variant="secondary" size="sm" className="glass-button">Log In</Button>
-            </Link>
-            <Link to="/signup">
-              <Button variant="primary" size="sm" className="shadow-lg shadow-accent-primary/25 hover:shadow-accent-primary/40 transition-shadow">Book Demo</Button>
-            </Link>
+          <div className="flex gap-4 items-center">
+            {user ? (
+              <div className="flex items-center gap-3">
+                <span className="text-text-secondary text-sm hidden md:inline">
+                  Welcome, <span className="text-accent-primary font-medium">{user.name}</span>
+                </span>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => navigate('/dashboard')}
+                  className="shadow-lg shadow-accent-primary/25 hover:shadow-accent-primary/40 transition-shadow"
+                >
+                  Go to Dashboard
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" className="hidden md:flex text-text-secondary hover:text-white transition-colors">Features</Button>
+                <Button variant="ghost" size="sm" className="hidden md:flex text-text-secondary hover:text-white transition-colors">Pricing</Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="glass-button"
+                  onClick={() => setIsLoginModalOpen(true)}
+                >
+                  Log In
+                </Button>
+                <Link to="/signup">
+                  <Button variant="primary" size="sm" className="shadow-lg shadow-accent-primary/25 hover:shadow-accent-primary/40 transition-shadow">Book Demo</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -205,6 +248,13 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
     </div>
   );
 };
