@@ -1,51 +1,66 @@
+// javascript
 import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
-  Wrench, 
   Users, 
   Settings, 
   ClipboardList, 
-  Box 
+  Box,
+  Calendar,
+  BarChart2
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Sidebar = () => {
-  const navItems = [
+  const links = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: Box, label: 'Equipment', path: '/dashboard/equipment' },
     { icon: ClipboardList, label: 'Requests', path: '/dashboard/requests' },
+    { icon: Calendar, label: 'Calendar', path: '/dashboard/calendar' },
     { icon: Users, label: 'Teams', path: '/dashboard/teams' },
+    { icon: BarChart2, label: 'Reporting', path: '/dashboard/reporting' },
     { icon: Settings, label: 'Settings', path: '/dashboard/settings' },
   ];
 
   return (
-    <aside className="w-64 bg-background-secondary border-r border-border h-screen sticky top-0 flex flex-col">
+    <aside className="w-64 bg-background-card border-r border-border min-h-screen flex flex-col fixed left-0 top-0">
       <div className="p-6 flex items-center gap-3">
-        <div className="w-8 h-8 bg-accent-primary rounded-lg shadow-[0_0_10px_#3B82F6] flex items-center justify-center">
-          <span className="font-bold text-white">G</span>
+        <div className="w-8 h-8 bg-accent-primary rounded-lg flex items-center justify-center">
+            <span className="font-bold text-white">G</span>
         </div>
-        <span className="text-lg font-bold text-text-primary tracking-tight">GearGuard</span>
+        <span className="text-xl font-bold bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent">
+            GearGuard
+        </span>
       </div>
 
-      <nav className="flex-1 px-4 py-4 space-y-1">
-        {navItems.map((item) => (
+      <nav className="flex-1 px-4 space-y-2 mt-4">
+        {links.map((link) => (
           <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) => `
-              flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group
-              ${isActive 
-                ? 'bg-accent-primary/10 text-accent-primary border border-accent-primary/20' 
-                : 'text-text-secondary hover:bg-background-card hover:text-text-primary'
-              }
-            `}
+            key={link.path}
+            to={link.path}
+            end={link.path === '/dashboard'}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${
+                isActive 
+                  ? 'text-white bg-accent-primary/10 shadow-glow' 
+                  : 'text-text-secondary hover:bg-background-secondary hover:text-text-primary'
+              }`
+            }
           >
-            <item.icon className="w-5 h-5" />
-            <span className="font-medium">{item.label}</span>
-            {item.path === '/dashboard/requests' && (
-              <span className="ml-auto bg-accent-danger/20 text-accent-danger text-xs px-2 py-0.5 rounded-full">
-                3
-              </span>
+            {({ isActive }) => (
+                <>
+                    {isActive && (
+                        <motion.div
+                            layoutId="activeTab"
+                            className="absolute left-0 w-1 h-8 bg-accent-primary rounded-r-full"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                        />
+                    )}
+                    <link.icon className={`w-5 h-5 ${isActive ? 'text-accent-primary' : 'group-hover:text-text-primary'}`} />
+                    <span className="font-medium">{link.label}</span>
+                </>
             )}
           </NavLink>
         ))}
