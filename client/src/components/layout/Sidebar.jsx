@@ -29,7 +29,6 @@ const Sidebar = () => {
     { icon: Users, label: 'Teams', path: '/dashboard/teams' },
     { icon: BarChart2, label: 'Reporting', path: '/dashboard/reporting' },
     { icon: Factory, label: 'Work Centers', path: '/dashboard/work-centers' },
-    { icon: Settings, label: 'Settings', path: '/dashboard/settings' },
   ];
 
   return (
