@@ -11,6 +11,7 @@ app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/requests", require("./routes/requests.routes"));
 app.use("/api/calendar", require("./routes/calendar.routes"));
 app.use("/api/equipment", require("./routes/equipment.routes"));
+app.use("/api/work-centers", require("./routes/workcenter.routes"));
 
 
 

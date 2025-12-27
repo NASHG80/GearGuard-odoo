@@ -26,15 +26,24 @@ const CreateWorkCenterPage = () => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        // Simulate API call
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const response = await fetch('http://localhost:5000/api/work-centers', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('gearguard_token')}`
+                },
+                body: JSON.stringify(formData)
+            });
 
-            // In a real app, we would POST to an endpoint here
-            console.log('Work Center Data:', formData);
+            const data = await response.json();
 
-            toast.success('Work Center created successfully!');
-            navigate('/dashboard/work-centers');
+            if (data.success) {
+                toast.success('Work Center created successfully!');
+                navigate('/dashboard/work-centers');
+            } else {
+                toast.error(data.message || 'Failed to create work center');
+            }
         } catch (error) {
             console.error('Submit error:', error);
             toast.error('Error creating work center');

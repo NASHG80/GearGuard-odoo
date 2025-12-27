@@ -32,7 +32,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="w-72 h-screen sticky top-0 flex flex-col bg-background-secondary/30 backdrop-blur-xl border-r border-white/5 z-30">
+    <aside className="w-72 h-screen fixed top-0 left-0 flex flex-col bg-background-secondary/30 backdrop-blur-xl border-r border-white/5 z-30">
       {/* Logo Area */}
       <div className="p-6 flex items-center gap-3 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-accent-primary/10 to-transparent opacity-50"></div>

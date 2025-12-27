@@ -1,11 +1,55 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Settings, Search, Filter, Plus, MoreHorizontal } from 'lucide-react';
-import { workCenters } from '../data/workCenters';
 import Button from '../components/ui/Button';
+import toast from 'react-hot-toast';
 
 const WorkCentersPage = () => {
     const navigate = useNavigate();
+    const [workCenters, setWorkCenters] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchWorkCenters();
+    }, []);
+
+    const fetchWorkCenters = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/work-centers', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('gearguard_token')}`
+                }
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                // Transform data to match table display format
+                const transformed = data.workCenters.map(wc => ({
+                    id: wc.id,
+                    name: wc.name,
+                    code: wc.code,
+                    tag: wc.tag,
+                    alternativeWorkcenters: [], // This field doesn't exist yet in DB
+                    costPerHour: parseFloat(wc.cost_per_hour) || 0,
+                    capacity: parseFloat(wc.capacity) || 0,
+                    oeeTarget: parseFloat(wc.efficiency_target) || 0
+                }));
+                setWorkCenters(transformed);
+            } else {
+                toast.error('Failed to load work centers');
+            }
+        } catch (error) {
+            console.error('Fetch work centers error:', error);
+            toast.error('Error loading work centers');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return <div className="text-center py-10 text-text-secondary">Loading work centers...</div>;
+    }
+
     return (
         <div className="space-y-6">
             {/* Header */}
