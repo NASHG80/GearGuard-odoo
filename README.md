@@ -81,6 +81,8 @@ Before you begin, ensure you have the following installed:
    The frontend will start on `http://localhost:5173` (Vite default)
 
 ##  MySQL Database Setup
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/dc3a2c6e-0ea1-4fec-9059-27cd345ea1e5" />
+
 
 ### 1. Create the Database
 
