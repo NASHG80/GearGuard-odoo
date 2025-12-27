@@ -1,23 +1,20 @@
-<<<<<<< HEAD
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ArrowRight, BarChart3, Zap, Lock, Globe } from 'lucide-react';
 import Button from '../components/ui/Button';
-import LoginModal from '../components/auth/LoginModal';
-import { getCurrentUser } from '../services/authService';
+import { useAuth } from '../context/AuthContext';
 
 const LandingPage = () => {
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [user, setUser] = useState(getCurrentUser());
+  const { user } = useAuth();
   const navigate = useNavigate();
-
-  const handleLoginSuccess = (userData) => {
-    setUser(userData);
-    // Redirect to dashboard after successful login
-    setTimeout(() => {
-      navigate('/dashboard');
-    }, 500);
-  };
+  const targetRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: targetRef,
+    offset: ["start start", "end start"]
+  });
+  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
 
   return (
     <div className="min-h-screen bg-background-primary flex flex-col relative overflow-hidden">
@@ -58,77 +55,21 @@ const LandingPage = () => {
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => setIsLoginModalOpen(true)}
+                onClick={() => navigate('/login')}
               >
                 Log In
               </Button>
-              <Button variant="primary" size="sm">Book Demo</Button>
+              <Button variant="primary" size="sm" onClick={() => navigate('/signup')}>Sign Up</Button>
             </>
           )}
-=======
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
-import Button from '../components/ui/Button';
-import { ArrowRight, Shield, Zap, BarChart3, Globe, Lock } from 'lucide-react';
-
-const LandingPage = () => {
-  const targetRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: targetRef,
-    offset: ["start start", "end start"]
-  });
-
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.8]);
-
-  return (
-    <div className="min-h-screen bg-background-primary flex flex-col relative overflow-x-hidden selection:bg-accent-primary selection:text-white">
-
-      {/* Dynamic Background */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-background-primary to-background-primary opacity-80"></div>
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-accent-primary/20 rounded-full blur-[120px] opacity-30 animate-pulse-glow"></div>
-        <div className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-accent-secondary/10 rounded-full blur-[100px] opacity-20"></div>
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
-      </div>
-
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-background-primary/50 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-3"
-          >
-            <div className="w-10 h-10 bg-gradient-to-br from-accent-primary to-accent-secondary rounded-xl shadow-lg shadow-accent-primary/20 flex items-center justify-center relative overflow-hidden group">
-              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-              <Shield className="w-6 h-6 text-white relative z-10" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-white">GearGuard</span>
-          </motion.div>
-
-          <div className="flex gap-4">
-            <Button variant="ghost" size="sm" className="hidden md:flex text-text-secondary hover:text-white">Features</Button>
-            <Button variant="ghost" size="sm" className="hidden md:flex text-text-secondary hover:text-white">Pricing</Button>
-            <Button variant="secondary" size="sm" className="glass-button">Log In</Button>
-            <Button variant="primary" size="sm" className="shadow-lg shadow-accent-primary/25">Book Demo</Button>
-          </div>
->>>>>>> 34d515df813af2266609a3f880e891f382556d95
         </div>
       </header>
 
       {/* Hero Section */}
       <main ref={targetRef} className="relative z-10 pt-32 pb-20 px-6">
         <motion.div
-<<<<<<< HEAD
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="max-w-4xl mx-auto space-y-6"
-=======
           style={{ opacity, scale }}
           className="max-w-5xl mx-auto text-center space-y-8"
->>>>>>> 34d515df813af2266609a3f880e891f382556d95
         >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -143,12 +84,6 @@ const LandingPage = () => {
             The Future of Industrial Maintenance
           </motion.div>
 
-<<<<<<< HEAD
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight text-white mb-6">
-            Stop managing breakdowns. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-primary to-blue-400">
-              Start predicting them.
-=======
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -158,23 +93,9 @@ const LandingPage = () => {
             Predict Failures. <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-primary via-blue-400 to-accent-secondary animate-gradient-x">
               Maximize Uptime.
->>>>>>> 34d515df813af2266609a3f880e891f382556d95
             </span>
           </motion.h1>
 
-<<<<<<< HEAD
-          <p className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-10">
-            GearGuard isn't just a maintenance log. It's an intelligent platform that tells you
-            which machines are silently becoming expensive mistakes.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button
-              size="lg"
-              className="w-full sm:w-auto min-w-[200px]"
-              onClick={() => setIsLoginModalOpen(true)}
-            >
-=======
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -192,7 +113,6 @@ const LandingPage = () => {
             className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8"
           >
             <Button size="lg" className="w-full sm:w-auto min-w-[200px] h-14 text-lg shadow-xl shadow-accent-primary/20 group">
->>>>>>> 34d515df813af2266609a3f880e891f382556d95
               Get Started Now
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
@@ -202,23 +122,6 @@ const LandingPage = () => {
           </motion.div>
         </motion.div>
 
-<<<<<<< HEAD
-        {/* Floating UI Elements Mockup */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-          className="mt-20 w-full max-w-5xl relative"
-        >
-          <div className="rounded-xl border border-border bg-background-secondary/50 backdrop-blur-sm p-2 shadow-2xl">
-            <div className="rounded-lg bg-background-primary overflow-hidden border border-border/50 aspect-video relative flex items-center justify-center text-text-muted">
-              {/* Placeholder for Dashboard Image/Component */}
-              <div className="text-center space-y-2">
-                <div className="text-4xl">📊</div>
-                <p>Interactive Dashboard Preview</p>
-                <p className="text-sm">(Will be replaced with live components)</p>
-              </div>
-=======
         {/* Dashboard Preview */}
         <motion.div
           initial={{ opacity: 0, y: 100, rotateX: 20 }}
@@ -241,20 +144,11 @@ const LandingPage = () => {
 
               {/* Hover Glow Effect */}
               <div className="absolute inset-0 bg-gradient-to-t from-background-primary via-transparent to-transparent opacity-60"></div>
->>>>>>> 34d515df813af2266609a3f880e891f382556d95
             </div>
           </div>
         </motion.div>
       </main>
 
-<<<<<<< HEAD
-      {/* Login Modal */}
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        onLoginSuccess={handleLoginSuccess}
-      />
-=======
       {/* Features Grid */}
       <section className="relative z-10 py-32 px-6 bg-background-secondary/50">
         <div className="max-w-7xl mx-auto">
@@ -282,7 +176,6 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
->>>>>>> 34d515df813af2266609a3f880e891f382556d95
     </div>
   );
 };
