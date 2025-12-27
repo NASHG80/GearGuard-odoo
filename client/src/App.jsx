@@ -15,6 +15,7 @@ import EquipmentDetailPage from './pages/EquipmentDetailPage';
 import MaintenanceTeamsPage from './pages/MaintenanceTeamsPage';
 import CalendarView from './pages/CalendarView';
 import ReportingPage from './pages/ReportingPage';
+import WorkCentersPage from './pages/WorkCentersPage';
 import CreateEquipmentPage from './pages/CreateEquipmentPage';
 
 // Placeholder components for routes we haven't built yet
@@ -60,7 +61,7 @@ function App() {
           {/* Protected Dashboard Routes with Layout */}
           <Route path="/dashboard" element={
             // <ProtectedRoute>
-              <DashboardLayout />
+            <DashboardLayout />
             // </ProtectedRoute>
           }>
             <Route index element={<DashboardHome />} />
@@ -72,6 +73,7 @@ function App() {
             <Route path="teams" element={<MaintenanceTeamsPage />} />
             <Route path="calendar" element={<CalendarView />} />
             <Route path="reporting" element={<ReportingPage />} />
+            <Route path="work-centers" element={<WorkCentersPage />} />
             <Route path="settings" element={<Placeholder title="System Settings" />} />
           </Route>
 
