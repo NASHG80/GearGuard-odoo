@@ -17,6 +17,7 @@ import CalendarView from './pages/CalendarView';
 import ReportingPage from './pages/ReportingPage';
 import WorkCentersPage from './pages/WorkCentersPage';
 import CreateEquipmentPage from './pages/CreateEquipmentPage';
+import CreateWorkCenterPage from './pages/CreateWorkCenterPage';
 
 // Placeholder components for routes we haven't built yet
 const Placeholder = ({ title }) => (
@@ -74,6 +75,7 @@ function App() {
             <Route path="calendar" element={<CalendarView />} />
             <Route path="reporting" element={<ReportingPage />} />
             <Route path="work-centers" element={<WorkCentersPage />} />
+            <Route path="create-work-center" element={<CreateWorkCenterPage />} />
             <Route path="settings" element={<Placeholder title="System Settings" />} />
           </Route>
 

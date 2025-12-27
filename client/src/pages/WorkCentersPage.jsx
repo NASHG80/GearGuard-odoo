@@ -1,9 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Settings, Search, Filter, Plus, MoreHorizontal } from 'lucide-react';
 import { workCenters } from '../data/workCenters';
 import Button from '../components/ui/Button';
 
 const WorkCentersPage = () => {
+    const navigate = useNavigate();
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -17,7 +19,7 @@ const WorkCentersPage = () => {
                         <Filter className="w-4 h-4" />
                         Filter
                     </Button>
-                    <Button variant="primary" className="gap-2">
+                    <Button variant="primary" className="gap-2" onClick={() => navigate('/dashboard/create-work-center')}>
                         <Plus className="w-4 h-4" />
                         Create
                     </Button>
