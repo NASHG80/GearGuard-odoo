@@ -1,105 +1,169 @@
+import { useState } from 'react';
+import { AlertTriangle, Users, ClipboardList, TrendingUp, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Activity, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react';
+import Button from '../components/ui/Button';
+
+// Mock Data
+const mockRequests = [
+  { id: 1, subject: 'Hydraulic Press Oil Leak', employee: 'Mitchell Admin', technician: 'Ann Foster', category: 'Hydraulic', stage: 'New Request', company: 'GearGuard Industries' },
+  { id: 2, subject: 'CNC Calibration Required', employee: 'Sarah Chen', technician: 'Mike Wilson', category: 'CNC Machine', stage: 'In Progress', company: 'GearGuard Industries' },
+  { id: 3, subject: 'Conveyor Belt Replacement', employee: 'John Smith', technician: 'Ann Foster', category: 'Conveyor', stage: 'New Request', company: 'GearGuard Industries' },
+  { id: 4, subject: 'Compressor Noise Issue', employee: 'David Park', technician: 'Tom Harris', category: 'Compressor', stage: 'Overdue', company: 'GearGuard Industries' },
+];
 
 const DashboardHome = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredRequests = mockRequests.filter(req =>
+    req.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    req.employee.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    req.technician.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const stats = [
     {
-      label: 'Total Equipment',
-      value: '142',
-      change: '+12%',
-      icon: Activity,
-      color: 'text-accent-primary',
-      bg: 'bg-accent-primary/10',
-      border: 'border-accent-primary/20'
-    },
-    {
-      label: 'Critical Alerts',
-      value: '3',
-      change: '-2',
+      title: 'Critical Equipment',
+      value: '5 Units',
+      subtitle: '(Health < 30%)',
+      color: 'red',
       icon: AlertTriangle,
-      color: 'text-accent-danger',
-      bg: 'bg-accent-danger/10',
-      border: 'border-accent-danger/20'
+      bgColor: 'bg-red-500/10',
+      borderColor: 'border-red-500/20',
+      textColor: 'text-red-400'
     },
     {
-      label: 'Avg Health Score',
-      value: '94%',
-      change: '+2.4%',
-      icon: CheckCircle,
-      color: 'text-accent-success',
-      bg: 'bg-accent-success/10',
-      border: 'border-accent-success/20'
+      title: 'Technician Load',
+      value: '85% Utilized',
+      subtitle: '(Assign Carefully)',
+      color: 'blue',
+      icon: Users,
+      bgColor: 'bg-blue-500/10',
+      borderColor: 'border-blue-500/20',
+      textColor: 'text-blue-400'
     },
     {
-      label: 'Maintenance ROI',
-      value: '$12.5k',
-      change: '+8%',
-      icon: TrendingUp,
-      color: 'text-accent-secondary',
-      bg: 'bg-accent-secondary/10',
-      border: 'border-accent-secondary/20'
-    },
+      title: 'Open Requests',
+      value: '12 Pending',
+      subtitle: '3 Overdue',
+      color: 'green',
+      icon: ClipboardList,
+      bgColor: 'bg-emerald-500/10',
+      borderColor: 'border-emerald-500/20',
+      textColor: 'text-emerald-400'
+    }
   ];
 
+  const getStageColor = (stage) => {
+    switch (stage) {
+      case 'New Request':
+        return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+      case 'In Progress':
+        return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+      case 'Overdue':
+        return 'bg-red-500/10 text-red-400 border-red-500/20';
+      default:
+        return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-      >
+    <div className="space-y-6 p-6">
+      {/* Header with New Button */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-white">Maintenance Dashboard</h1>
+        <Button variant="primary" size="sm" className="shadow-lg shadow-accent-primary/20">
+          + New
+        </Button>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {stats.map((stat, index) => (
           <motion.div
-            key={index}
-            whileHover={{ y: -5 }}
-            className={`p-6 rounded-2xl border ${stat.border} ${stat.bg} backdrop-blur-sm relative overflow-hidden group`}
+            key={stat.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className={`${stat.bgColor} ${stat.borderColor} border rounded-2xl p-6 hover:scale-[1.02] transition-transform duration-300`}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div className="flex justify-between items-start mb-4 relative z-10">
-              <div className={`p-3 rounded-xl bg-background-primary/50 ${stat.color}`}>
-                <stat.icon className="w-6 h-6" />
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <p className="text-text-secondary text-sm font-medium mb-1">{stat.title}</p>
+                <h3 className={`text-3xl font-bold ${stat.textColor}`}>{stat.value}</h3>
+                <p className="text-text-muted text-xs mt-1">{stat.subtitle}</p>
               </div>
-              <span className={`text-xs font-medium px-2 py-1 rounded-full bg-background-primary/30 ${stat.color}`}>
-                {stat.change}
-              </span>
+              <div className={`${stat.bgColor} p-3 rounded-xl`}>
+                <stat.icon className={`w-6 h-6 ${stat.textColor}`} />
+              </div>
             </div>
-            <div className="relative z-10">
-              <p className="text-sm font-medium text-text-secondary">{stat.label}</p>
-              <p className="text-3xl font-bold text-white mt-1">{stat.value}</p>
+            <div className="flex items-center gap-2 text-xs">
+              <TrendingUp className={`w-4 h-4 ${stat.textColor}`} />
+              <span className="text-text-secondary">Updated 2 mins ago</span>
             </div>
           </motion.div>
         ))}
-      </motion.div>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 glass-panel rounded-2xl p-6 min-h-[400px]">
-          <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-            <Activity className="w-5 h-5 text-accent-primary" />
-            Maintenance Activity
-          </h3>
-          <div className="h-[300px] flex items-center justify-center border border-dashed border-white/10 rounded-xl bg-white/5">
-            <p className="text-text-muted">Chart Component Placeholder</p>
-          </div>
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
+        <input
+          type="text"
+          placeholder="Search requests, employees, technicians..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full bg-background-secondary/50 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white placeholder-text-muted focus:outline-none focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/50 transition-all"
+        />
+      </div>
+
+      {/* Requests Table */}
+      <div className="bg-background-secondary/30 border border-white/10 rounded-2xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-white/10 bg-background-secondary/50">
+                <th className="text-left py-4 px-6 text-sm font-semibold text-text-secondary uppercase tracking-wider">Subject</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-text-secondary uppercase tracking-wider">Employee</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-text-secondary uppercase tracking-wider">Technician</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-text-secondary uppercase tracking-wider">Category</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-text-secondary uppercase tracking-wider">Stage</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-text-secondary uppercase tracking-wider">Company</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredRequests.map((request, index) => (
+                <motion.tr
+                  key={request.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer group"
+                >
+                  <td className="py-4 px-6">
+                    <span className="text-white font-medium group-hover:text-accent-primary transition-colors">
+                      {request.subject}
+                    </span>
+                  </td>
+                  <td className="py-4 px-6 text-text-secondary">{request.employee}</td>
+                  <td className="py-4 px-6 text-text-secondary">{request.technician}</td>
+                  <td className="py-4 px-6 text-text-secondary">{request.category}</td>
+                  <td className="py-4 px-6">
+                    <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStageColor(request.stage)}`}>
+                      {request.stage}
+                    </span>
+                  </td>
+                  <td className="py-4 px-6 text-text-secondary">{request.company}</td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
-        <div className="glass-panel rounded-2xl p-6">
-          <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-accent-warning" />
-            Recent Alerts
-          </h3>
-          <div className="space-y-4">
-            {[1, 2, 3].map((_, i) => (
-              <div key={i} className="p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors cursor-pointer group">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-xs font-medium text-accent-warning bg-accent-warning/10 px-2 py-1 rounded-md">Warning</span>
-                  <span className="text-xs text-text-muted">2m ago</span>
-                </div>
-                <p className="text-sm font-medium text-white group-hover:text-accent-primary transition-colors">Hydraulic Pressure Low</p>
-                <p className="text-xs text-text-secondary mt-1">Press #4 - Main Line</p>
-              </div>
-            ))}
+        {filteredRequests.length === 0 && (
+          <div className="text-center py-12 text-text-muted">
+            No requests found matching "{searchQuery}"
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
