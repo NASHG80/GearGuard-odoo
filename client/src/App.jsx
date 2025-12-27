@@ -26,7 +26,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Toaster 
+        <Toaster
           position="top-right"
           toastOptions={{
             duration: 4000,
@@ -53,12 +53,12 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
-          
+
           {/* Protected Dashboard Routes with Layout */}
           <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
+
+            <DashboardLayout />
+
           }>
             <Route index element={<DashboardHome />} />
             <Route path="equipment" element={<EquipmentPage />} />

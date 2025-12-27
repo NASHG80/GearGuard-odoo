@@ -1,60 +1,145 @@
 @import "tailwindcss";
 
 @theme {
-  /* Dark, futuristic palette */
-  --color-background-primary: #030712; /* Very dark blue/black */
-  --color-background-secondary: #0f172a; /* Slate 900 */
-  --color-background-card: rgba(30, 41, 59, 0.7); /* Slate 800 with opacity for glass */
-  
-  --color-text-primary: #f8fafc; /* Slate 50 */
-  --color-text-secondary: #94a3b8; /* Slate 400 */
-  --color-text-muted: #64748b; /* Slate 500 */
-
+  --color-background-primary: #000000;
+  --color-background-secondary: #0a0a0a;
+  --color-background-card: rgba(20, 20, 20, 0.6);
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #a0a0a0;
+  --color-accent-primary: #3b82f6;
+  --color-accent-secondary: #8b5cf6;
   --color-border: rgba(255, 255, 255, 0.1);
-  --color-border-hover: rgba(255, 255, 255, 0.2);
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
 
-  /* Vibrant Accents */
-  --color-accent-primary: #3b82f6; /* Blue 500 */
-  --color-accent-secondary: #8b5cf6; /* Violet 500 */
-  --color-accent-success: #10b981; /* Emerald 500 */
-  --color-accent-warning: #f59e0b; /* Amber 500 */
-  --color-accent-danger: #ef4444; /* Red 500 */
-  --color-accent-glow: rgba(59, 130, 246, 0.5);
+  --font-sans: "Inter", system-ui, sans-serif;
 
-  /* Animations */
   --animate-fade-in: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-slide-up: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-pulse-glow: pulseGlow 3s infinite ease-in-out;
   --animate-float: float 6s ease-in-out infinite;
 
   @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
   }
+
   @keyframes slideUp {
-    0% { transform: translateY(40px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
+    0% {
+      transform: translateY(40px);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
+
   @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 10px var(--color-accent-glow); }
-    50% { box-shadow: 0 0 25px var(--color-accent-glow); }
+
+    0%,
+    100% {
+      box-shadow: 0 0 10px var(--color-accent-glow);
+    }
+
+    50% {
+      box-shadow: 0 0 25px var(--color-accent-glow);
+    }
   }
+
   @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
   }
 }
 
 /* Glassmorphism Utilities */
 .glass-panel {
-  @apply bg-background-card backdrop-blur-md border border-border shadow-xl;
+  @apply bg-background-card backdrop-blur-xl border border-white/10 shadow-2xl;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
 .glass-button {
-  @apply bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-sm transition-all duration-300;
+  @apply bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all duration-300 active:scale-95;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.glass-input {
+  @apply bg-white/5 border border-white/10 text-text-primary placeholder-text-secondary focus:outline-none focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/50 transition-all duration-300 backdrop-blur-sm;
 }
 
 body {
   @apply bg-background-primary text-text-primary antialiased selection:bg-accent-primary selection:text-white;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-background-secondary);
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-primary);
+}
+
+/* Dark Theme Overrides for React Big Calendar */
+.rbc-calendar {
+  @apply text-text-secondary;
+}
+
+.rbc-toolbar button {
+  @apply text-text-primary border-border hover:bg-white/5;
+}
+
+.rbc-toolbar button.rbc-active {
+  @apply bg-accent-primary text-white border-transparent;
+}
+
+.rbc-month-view,
+.rbc-time-view,
+.rbc-agenda-view {
+  @apply border-border bg-background-secondary/30 backdrop-blur-sm;
+}
+
+.rbc-day-bg+.rbc-day-bg,
+.rbc-month-row+.rbc-month-row,
+.rbc-header+.rbc-header {
+  @apply border-border;
+}
+
+.rbc-today {
+  @apply bg-accent-primary/10;
+}
+
+.rbc-event {
+  @apply bg-accent-primary border-transparent shadow-lg;
+}
+
+.rbc-off-range-bg {
+  @apply bg-background-primary/50;
 }
