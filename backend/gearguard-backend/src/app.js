@@ -13,6 +13,8 @@ app.use("/api/calendar", require("./routes/calendar.routes"));
 app.use("/api/equipment", require("./routes/equipment.routes"));
 
 
+
+
 app.get("/", (req, res) => {
   res.json({ message: "GearGuard Backend Running" });
 });

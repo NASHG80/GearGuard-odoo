@@ -3,21 +3,14 @@ const router = express.Router();
 
 const {
   getAllRequests,
+  getRequestById,
   createRequest,
-  assignRequest,
-  updateStatus,
-  getRequestsByEquipment,
-  getPreventiveCalendar
+  updateRequest
 } = require("../controllers/request.controller");
 
-// Get all requests
 router.get("/", getAllRequests);
-
-// Create new request
 router.post("/", createRequest);
-router.patch("/:id/assign", assignRequest);
-router.patch("/:id/status", updateStatus);
-router.get("/equipment/:id", getRequestsByEquipment);
-router.get("/calendar/preventive", getPreventiveCalendar);
+router.get("/:id", getRequestById);
+router.put("/:id", updateRequest);
 
 module.exports = router;

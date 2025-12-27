@@ -175,12 +175,14 @@ const DashboardHome = () => {
             <tbody>
               {filteredRequests.map((request, index) => (
                 <motion.tr
-                  key={request.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer group"
-                >
+  key={request.id}
+  onClick={() => navigate(`/dashboard/requests/${request.id}`)}   // 👈 ADD
+  initial={{ opacity: 0, x: -20 }}
+  animate={{ opacity: 1, x: 0 }}
+  transition={{ delay: index * 0.05 }}
+  className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer group"
+>
+
                   <td className="py-4 px-6">
                     <span className="text-white font-medium group-hover:text-accent-primary transition-colors">
                       {request.subject}

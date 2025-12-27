@@ -1,46 +1,53 @@
 const { pool } = require("../db/db");
 
-
 /**
- * GET ALL MAINTENANCE REQUESTS
- * Fetches all requests with user information
+ * GET ALL REQUESTS
  */
 exports.getAllRequests = async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      `SELECT 
+    const [rows] = await pool.query(`
+      SELECT 
         mr.*,
-        u.name as employee_name,
-        u.email as employee_email,
-        u.role as employee_role
+        u.name AS employee_name
       FROM maintenance_requests mr
       LEFT JOIN users u ON mr.created_by = u.id
-      ORDER BY mr.created_at DESC`
-    );
-
-    // Add company name to each request
-    const requestsWithCompany = rows.map(request => ({
-      ...request,
-      company: 'GearGuard Industries'
-    }));
+      ORDER BY mr.created_at DESC
+    `);
 
     res.json({
       success: true,
-      requests: requestsWithCompany
+      requests: rows.map(r => ({
+        ...r,
+        company: "GearGuard Industries"
+      }))
     });
   } catch (err) {
-    console.error('Get requests error:', err);
-    res.status(500).json({
-      success: false,
-      message: "Error fetching maintenance requests",
-      error: err.message
-    });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
 /**
- * CREATE MAINTENANCE REQUEST
- * Stores all form data from CreateRequestPage
+ * GET REQUEST BY ID (DETAIL PAGE)
+ */
+exports.getRequestById = async (req, res) => {
+  try {
+    const [[row]] = await pool.query(
+      "SELECT * FROM maintenance_requests WHERE id = ?",
+      [req.params.id]
+    );
+
+    if (!row) {
+      return res.status(404).json({ success: false, message: "Request not found" });
+    }
+
+    res.json({ success: true, request: row });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+/**
+ * CREATE REQUEST
  */
 exports.createRequest = async (req, res) => {
   try {
@@ -61,24 +68,17 @@ exports.createRequest = async (req, res) => {
       createdBy
     } = req.body;
 
-    // Validation
-    if (!subject || !requestDate || !createdBy) {
-      return res.status(400).json({
-        success: false,
-        message: "Subject, request date, and user ID are required"
-      });
-    }
-
-    // Insert into database
     const [result] = await pool.query(
-      `INSERT INTO maintenance_requests
-       (subject, maintenance_for, equipment, category, request_date, 
-        maintenance_type, team, technician, scheduled_date, duration, 
-        priority, description, instructions, created_by, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'NEW')`,
+      `
+      INSERT INTO maintenance_requests
+      (subject, maintenance_for, equipment, category, request_date,
+       maintenance_type, team, technician, scheduled_date, duration,
+       priority, description, instructions, created_by, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'NEW')
+      `,
       [
         subject,
-        maintenanceFor || 'equipment',
+        maintenanceFor || "equipment",
         equipment,
         category,
         requestDate,
@@ -94,137 +94,56 @@ exports.createRequest = async (req, res) => {
       ]
     );
 
-    res.status(201).json({
-      success: true,
-      message: "Maintenance request created successfully",
-      requestId: result.insertId
-    });
+    res.status(201).json({ success: true, requestId: result.insertId });
   } catch (err) {
-    console.error('Create request error:', err);
-    res.status(500).json({
-      success: false,
-      message: "Error creating maintenance request",
-      error: err.message
-    });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
 /**
- * STEP 3.3 — ASSIGN REQUEST (TEAM CHECK)
+ * UPDATE REQUEST (EDIT PAGE SAVE)
  */
-exports.assignRequest = async (req, res) => {
+exports.updateRequest = async (req, res) => {
   try {
-    const { technician_id } = req.body;
-    const { id } = req.params;
+    const {
+      subject,
+      priority,
+      status,
+      technician,
+      team,
+      description,
+      instructions,
+      scheduled_date
+    } = req.body;
 
-    const [[valid]] = await pool.query(
+    await pool.query(
       `
-      SELECT 1
-      FROM team_members tm
-      JOIN maintenance_requests mr
-        ON tm.team_id = mr.maintenance_team_id
-      WHERE tm.user_id = ? AND mr.id = ?
+      UPDATE maintenance_requests SET
+        subject = ?,
+        priority = ?,
+        status = ?,
+        technician = ?,
+        team = ?,
+        description = ?,
+        instructions = ?,
+        scheduled_date = ?
+      WHERE id = ?
       `,
-      [technician_id, id]
+      [
+        subject,
+        priority,
+        status,
+        technician,
+        team,
+        description,
+        instructions,
+        scheduled_date || null,
+        req.params.id
+      ]
     );
 
-    if (!valid) {
-      return res.status(403).json({
-        message: "Technician does not belong to this maintenance team"
-      });
-    }
-
-    await pool.query(
-      "UPDATE maintenance_requests SET assigned_to = ? WHERE id = ?",
-      [technician_id, id]
-    );
-
-    res.json({ message: "Request assigned successfully" });
+    res.json({ success: true, message: "Request updated successfully" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-/**
- * UPDATE REQUEST STATUS (Workflow enforcement)
- */
-exports.updateStatus = async (req, res) => {
-  try {
-    const { status, duration_hours } = req.body;
-    const { id } = req.params;
-
-    const [[request]] = await pool.query(
-      "SELECT status, equipment_id FROM maintenance_requests WHERE id = ?",
-      [id]
-    );
-
-    if (!request) {
-      return res.status(404).json({ message: "Request not found" });
-    }
-
-    const validFlow = {
-      NEW: ["IN_PROGRESS"],
-      IN_PROGRESS: ["REPAIRED", "SCRAP"]
-    };
-
-    if (!validFlow[request.status]?.includes(status)) {
-      return res.status(400).json({ message: "Invalid status transition" });
-    }
-
-    await pool.query(
-      `UPDATE maintenance_requests
-       SET status = ?, duration_hours = ?
-       WHERE id = ?`,
-      [status, duration_hours, id]
-    );
-
-    if (status === "SCRAP") {
-      await pool.query(
-        "UPDATE equipment SET is_scrapped = true WHERE id = ?",
-        [request.equipment_id]
-      );
-    }
-
-    res.json({ message: "Status updated successfully" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-/**
- * SMART BUTTON — GET REQUESTS BY EQUIPMENT
- */
-exports.getRequestsByEquipment = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const [rows] = await pool.query(
-      "SELECT * FROM maintenance_requests WHERE equipment_id = ?",
-      [id]
-    );
-
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-/**
- * CALENDAR VIEW — PREVENTIVE MAINTENANCE
- */
-exports.getPreventiveCalendar = async (req, res) => {
-  try {
-    const { from, to } = req.query;
-
-    const [rows] = await pool.query(
-      `SELECT * FROM maintenance_requests
-       WHERE type = 'PREVENTIVE'
-       AND scheduled_date BETWEEN ? AND ?`,
-      [from, to]
-    );
-
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
