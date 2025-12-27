@@ -15,6 +15,7 @@ import EquipmentDetailPage from './pages/EquipmentDetailPage';
 import MaintenanceTeamsPage from './pages/MaintenanceTeamsPage';
 import CalendarView from './pages/CalendarView';
 import ReportingPage from './pages/ReportingPage';
+import CreateEquipmentPage from './pages/CreateEquipmentPage';
 
 // Placeholder components for routes we haven't built yet
 const Placeholder = ({ title }) => (
@@ -67,6 +68,7 @@ function App() {
             <Route path="equipment/:id" element={<EquipmentDetailPage />} />
             <Route path="requests" element={<RequestsPage />} />
             <Route path="create-request" element={<CreateRequestPage />} />
+            <Route path="create-equipment" element={<CreateEquipmentPage />} />
             <Route path="teams" element={<MaintenanceTeamsPage />} />
             <Route path="calendar" element={<CalendarView />} />
             <Route path="reporting" element={<ReportingPage />} />

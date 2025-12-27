@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import EquipmentCard from '../components/equipment/EquipmentCard';
 import Button from '../components/ui/Button';
 
@@ -11,6 +12,7 @@ const MOCK_EQUIPMENT_LIST = [
 ];
 
 const EquipmentPage = () => {
+  const navigate = useNavigate();
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -18,7 +20,7 @@ const EquipmentPage = () => {
             <h2 className="text-2xl font-bold text-text-primary">Equipment Assets</h2>
             <p className="text-text-secondary">Manage and monitor asset health</p>
         </div>
-        <Button variant="primary" size="md">+ Add Equipment</Button>
+        <Button variant="primary" size="md" onClick={() => navigate('/dashboard/create-equipment')}>+ Add Equipment</Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
