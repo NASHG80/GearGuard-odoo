@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AlertTriangle, Users, ClipboardList, TrendingUp, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Button from '../components/ui/Button';
+import CreateRequestModal from '../components/forms/CreateRequestModal';
 
 // Mock Data
 const mockRequests = [
@@ -13,6 +14,7 @@ const mockRequests = [
 
 const DashboardHome = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const filteredRequests = mockRequests.filter(req =>
     req.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -71,7 +73,12 @@ const DashboardHome = () => {
       {/* Header with New Button */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-white">Maintenance Dashboard</h1>
-        <Button variant="primary" size="sm" className="shadow-lg shadow-accent-primary/20">
+        <Button
+          variant="primary"
+          size="sm"
+          className="shadow-lg shadow-accent-primary/20"
+          onClick={() => setIsCreateModalOpen(true)}
+        >
           + New
         </Button>
       </div>
@@ -165,6 +172,11 @@ const DashboardHome = () => {
           </div>
         )}
       </div>
+
+      <CreateRequestModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
     </div>
   );
 };
