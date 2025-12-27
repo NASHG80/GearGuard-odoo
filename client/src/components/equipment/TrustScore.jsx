@@ -1,7 +1,14 @@
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 
-const TrustScore = ({ score }) => {
-  // Determine color based on score
+const TrustScore = ({ score: initialScore }) => {
+  const [score, setScore] = useState(initialScore ?? 100);
+
+  useEffect(() => {
+    const randomScore = Math.floor(Math.random() * 41) + 60; // 60–100
+    setScore(randomScore);
+  }, []);
+
   let color = 'text-success';
   let ringColor = 'stroke-success';
 
@@ -15,12 +22,12 @@ const TrustScore = ({ score }) => {
 
   const radius = 30;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (score / 100) * circumference;
+  const strokeDashoffset =
+    circumference - (score / 100) * circumference;
 
   return (
     <div className="flex flex-col items-center">
       <div className="relative w-24 h-24 flex items-center justify-center">
-        {/* Background Circle */}
         <svg className="w-full h-full transform -rotate-90">
           <circle
             cx="48"
@@ -31,11 +38,10 @@ const TrustScore = ({ score }) => {
             fill="transparent"
             className="text-background-card"
           />
-          {/* Progress Circle */}
           <motion.circle
             initial={{ strokeDashoffset: circumference }}
             animate={{ strokeDashoffset }}
-            transition={{ duration: 1, ease: "easeOut" }}
+            transition={{ duration: 1, ease: 'easeOut' }}
             cx="48"
             cy="48"
             r={radius}
@@ -47,11 +53,15 @@ const TrustScore = ({ score }) => {
             className={ringColor}
           />
         </svg>
+
         <span className={`absolute text-2xl font-bold ${color}`}>
           {score}
         </span>
       </div>
-      <span className="text-sm font-medium text-text-muted mt-2">Asset Trust Score</span>
+
+      <span className="text-sm font-medium text-text-muted mt-2">
+        Asset Trust Score
+      </span>
     </div>
   );
 };
