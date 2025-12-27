@@ -1,5 +1,11 @@
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Tool, Calendar as CalIcon, AlertTriangle } from 'lucide-react';
+import {
+  ArrowLeft,
+  Wrench,
+  Calendar as CalIcon,
+  AlertTriangle
+} from 'lucide-react';
+
 import Button from '../components/ui/Button';
 import TrustScore from '../components/equipment/TrustScore';
 import DebtMeter from '../components/equipment/DebtMeter';
