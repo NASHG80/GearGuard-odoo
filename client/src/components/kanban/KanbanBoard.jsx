@@ -1,71 +1,94 @@
-import { useState } from 'react';
-import { DndContext, DragOverlay, closestCorners, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import KanbanColumn from './KanbanColumn';
-import RequestCard from './RequestCard';
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { useState } from "react";
+
+const STATUS_MAP = {
+  "New Requests": "NEW",
+  "In Progress": "IN_PROGRESS",
+  "Repaired / Closed": "COMPLETED",
+  "Scrap Review": "CANCELLED",
+};
 
 const KanbanBoard = ({ initialRequests }) => {
   const [requests, setRequests] = useState(initialRequests);
-  const [activeId, setActiveId] = useState(null);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  );
-
-  const handleDragStart = (event) => {
-    setActiveId(event.active.id);
+  const grouped = {
+    "New Requests": requests.filter(r => r.status === "NEW"),
+    "In Progress": requests.filter(r => r.status === "IN_PROGRESS"),
+    "Repaired / Closed": requests.filter(r => r.status === "COMPLETED"),
+    "Scrap Review": requests.filter(r => r.status === "CANCELLED"),
   };
 
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
+  const onDragEnd = async (result) => {
+    if (!result.destination) return;
 
-    if (!over) return;
+    const requestId = result.draggableId.replace("REQ-", "");
+    const newStatus = STATUS_MAP[result.destination.droppableId];
 
-    const activeId = active.id;
-    // If dropped on a column container (which has ID = status)
-    // OR if dropped on a card, we find the column it belongs to.
-    
-    // Simple logic: If we drop over a column, update status.
-    // Ideally we also handle re-ordering within column, but for MVP we focus on status change.
-    
-    // In this simplified version, the 'over' ID corresponds to the Droppable ID of the column
-    if (['NEW', 'IN_PROGRESS', 'REPAIRED', 'SCRAP'].includes(over.id)) {
-        setRequests((items) =>
-            items.map((item) =>
-                item.id === activeId ? { ...item, status: over.id } : item
-            )
-        );
+    /* Optimistic UI */
+    setRequests(prev =>
+      prev.map(r =>
+        r.id === `REQ-${requestId}` ? { ...r, status: newStatus } : r
+      )
+    );
+
+    /* Persist to DB */
+    const res = await fetch(
+      `http://localhost:5000/api/requests/${requestId}/status`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      }
+    );
+
+    if (!res.ok) {
+      console.error("Failed to update status");
     }
-
-    setActiveId(null);
   };
-
-  const activeRequest = activeId ? requests.find((r) => r.id === activeId) : null;
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCorners}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="flex gap-4 h-[calc(100vh-200px)] overflow-x-auto pb-4">
-        {['NEW', 'IN_PROGRESS', 'REPAIRED', 'SCRAP'].map((status) => (
-            <KanbanColumn 
-                key={status} 
-                id={status} 
-                requests={requests.filter(r => r.status === status)} 
-            />
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className="grid grid-cols-4 gap-6">
+        {Object.entries(grouped).map(([column, items]) => (
+          <Droppable key={column} droppableId={column}>
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className="bg-black/40 rounded-xl p-4 min-h-[500px]"
+              >
+                <h3 className="text-white font-bold mb-4">{column}</h3>
+
+                {items.map((req, index) => (
+                  <Draggable
+                    key={req.id}
+                    draggableId={req.id}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        className="bg-[#161B22] p-4 mb-3 rounded-lg border border-white/10"
+                      >
+                        <h4 className="text-white font-semibold">{req.subject}</h4>
+                        <p className="text-sm text-gray-400">
+                          Technician: {req.technician}
+                        </p>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
         ))}
       </div>
-
-      <DragOverlay>
-        {activeRequest ? <RequestCard request={activeRequest} /> : null}
-      </DragOverlay>
-    </DndContext>
+    </DragDropContext>
   );
 };
 

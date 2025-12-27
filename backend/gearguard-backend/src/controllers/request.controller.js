@@ -1,8 +1,6 @@
 const { pool } = require("../db/db");
 
-/**
- * GET ALL REQUESTS
- */
+/* ---------------- GET ALL REQUESTS ---------------- */
 exports.getAllRequests = async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -26,9 +24,7 @@ exports.getAllRequests = async (req, res) => {
   }
 };
 
-/**
- * GET REQUEST BY ID (DETAIL PAGE)
- */
+/* ---------------- GET REQUEST BY ID ---------------- */
 exports.getRequestById = async (req, res) => {
   try {
     const [[row]] = await pool.query(
@@ -46,9 +42,7 @@ exports.getRequestById = async (req, res) => {
   }
 };
 
-/**
- * CREATE REQUEST
- */
+/* ---------------- CREATE REQUEST ---------------- */
 exports.createRequest = async (req, res) => {
   try {
     const {
@@ -78,7 +72,7 @@ exports.createRequest = async (req, res) => {
       `,
       [
         subject,
-        maintenanceFor || "equipment",
+        maintenanceFor,
         equipment,
         category,
         requestDate,
@@ -100,9 +94,7 @@ exports.createRequest = async (req, res) => {
   }
 };
 
-/**
- * UPDATE REQUEST (EDIT PAGE SAVE)
- */
+/* ---------------- UPDATE REQUEST (EDIT PAGE) ---------------- */
 exports.updateRequest = async (req, res) => {
   try {
     const {
@@ -142,7 +134,33 @@ exports.updateRequest = async (req, res) => {
       ]
     );
 
-    res.json({ success: true, message: "Request updated successfully" });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+/* ---------------- ✅ KANBAN STATUS UPDATE ---------------- */
+exports.updateRequestStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const allowed = ["NEW", "IN_PROGRESS", "COMPLETED", "CANCELLED"];
+    if (!allowed.includes(status)) {
+      return res.status(400).json({ success: false, message: "Invalid status" });
+    }
+
+    const [result] = await pool.query(
+      "UPDATE maintenance_requests SET status = ? WHERE id = ?",
+      [status, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: "Request not found" });
+    }
+
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
